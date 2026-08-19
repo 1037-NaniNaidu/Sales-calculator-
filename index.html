@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1565c0">
+  <title>Sales Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="app">
+    <header>
+      <h1>Sales Calculator</h1>
+      <p>Track daily stock sales and calculate your total.</p>
+    </header>
+
+    <section class="card">
+      <label for="cost">Cost per stock (₹)</label>
+      <input id="cost" type="number" min="0" step="0.01" placeholder="e.g. 50">
+
+      <label for="days">Number of days</label>
+      <input id="days" type="number" min="1" max="366" placeholder="e.g. 30">
+
+      <button id="start">Start</button>
+    </section>
+
+    <section id="dailySection" class="card hidden">
+      <h2>Daily Sales</h2>
+      <div id="dailyInputs"></div>
+      <button id="calculate">Calculate Sales</button>
+    </section>
+
+    <section id="result" class="card result hidden"></section>
+
+    <button id="clear" class="secondary">Clear</button>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>

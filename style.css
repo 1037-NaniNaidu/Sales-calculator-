@@ -1,0 +1,90 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #eef3f8;
+  color: #17212b;
+}
+
+.app {
+  width: min(100% - 24px, 620px);
+  margin: 0 auto;
+  padding: 18px 0 30px;
+}
+
+header {
+  text-align: center;
+  padding: 12px 8px 18px;
+}
+
+h1 { margin: 0 0 6px; font-size: 30px; }
+header p { margin: 0; color: #5f6b76; }
+
+.card {
+  background: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+label {
+  display: block;
+  margin: 8px 0 7px;
+  font-weight: 700;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #c6cdd4;
+  border-radius: 10px;
+  font-size: 17px;
+  margin-bottom: 8px;
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 10px;
+  padding: 14px;
+  margin-top: 12px;
+  font-size: 17px;
+  font-weight: 700;
+  background: #1565c0;
+  color: white;
+}
+
+button:active { transform: scale(.99); }
+
+.secondary {
+  background: #68737d;
+  margin-bottom: 20px;
+}
+
+.hidden { display: none; }
+
+h2 { margin-top: 0; }
+
+.day {
+  border: 1px solid #d8dee4;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 10px 0;
+}
+
+.day-title {
+  font-weight: 700;
+  margin-bottom: 7px;
+}
+
+.daily-total {
+  color: #4d5a65;
+  font-size: 14px;
+  margin-top: 5px;
+}
+
+.result h2 { margin-bottom: 10px; }
+.summary-row { padding: 5px 0; }
+.total { font-weight: 800; font-size: 20px; }
