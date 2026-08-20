@@ -7,33 +7,152 @@
   <title>Sales Calculator</title>
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+
   <main class="app">
+
     <header>
       <h1>Sales Calculator</h1>
       <p>Track daily stock sales and calculate your total.</p>
     </header>
 
+
+    <!-- =================================
+         EXISTING SALES CALCULATOR
+    ================================== -->
+
     <section class="card">
-      <label for="cost">Cost per stock (₹)</label>
-      <input id="cost" type="number" min="0" step="0.01" placeholder="e.g. 50">
 
-      <label for="days">Number of days</label>
-      <input id="days" type="number" min="1" max="366" placeholder="e.g. 30">
+      <label for="cost">
+        Cost per stock (₹)
+      </label>
 
-      <button id="start">Start</button>
+      <input
+        id="cost"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="e.g. 50"
+      >
+
+
+      <label for="days">
+        Number of days
+      </label>
+
+      <input
+        id="days"
+        type="number"
+        min="1"
+        max="366"
+        placeholder="e.g. 30"
+      >
+
+      <button id="start">
+        Start
+      </button>
+
     </section>
 
-    <section id="dailySection" class="card hidden">
+
+    <section
+      id="dailySection"
+      class="card hidden"
+    >
+
       <h2>Daily Sales</h2>
+
       <div id="dailyInputs"></div>
-      <button id="calculate">Calculate Sales</button>
+
+      <button id="calculate">
+        Calculate Sales
+      </button>
+
     </section>
 
-    <section id="result" class="card result hidden"></section>
 
-    <button id="clear" class="secondary">Clear</button>
+    <section
+      id="result"
+      class="card result hidden">
+    </section>
+
+
+    <button
+      id="clear"
+      class="secondary">
+      Clear
+    </button>
+
+
+    <!-- =================================
+         REAL-TIME SALES TRACKER
+    ================================== -->
+
+    <section class="card sales-tracker">
+
+      <h2>Real-Time Sales Tracker</h2>
+
+      <p>
+        Record each sale when it happens.
+      </p>
+
+
+      <!-- Current sales day -->
+
+      <h3 id="realTimeDay">
+        Sales Day 1
+      </h3>
+
+
+      <!-- Quantity input -->
+
+      <label for="realTimeQuantity">
+        Quantity Sold
+      </label>
+
+      <input
+        id="realTimeQuantity"
+        type="number"
+        min="1"
+        step="1"
+        placeholder="Enter quantity sold"
+      >
+
+
+      <button id="addRealTimeSale">
+        Add Sale
+      </button>
+
+
+      <!-- Current day total -->
+
+      <h3 id="realTimeTotal">
+        Today's Total: 0
+      </h3>
+
+
+      <!-- History -->
+
+      <h2>Sales History</h2>
+
+      <div id="realTimeHistory">
+        <p>No sales recorded yet.</p>
+      </div>
+
+
+      <button
+        id="clearRealTimeSales"
+        class="secondary">
+        Clear Sales History
+      </button>
+
+    </section>
+
   </main>
+
+
   <script src="script.js"></script>
+
 </body>
-</html>
+  </html>
