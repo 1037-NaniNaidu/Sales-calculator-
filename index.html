@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1565c0">
-
     <title>Sales Calculator</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -14,26 +12,19 @@
 
 <main class="app">
 
-    <!-- =========================================
-         HEADER
-    ========================================== -->
-
     <header>
         <h1>Sales Calculator</h1>
-
-        <p>
-            Calculate and track your sales every day.
-        </p>
+        <p>Enter each sale once and track all daily sales automatically.</p>
     </header>
 
 
     <!-- =========================================
-         MAIN SALES SETTINGS
+         COMBINED SALES CALCULATOR
     ========================================== -->
 
     <section class="card">
 
-        <h2>Sales Settings</h2>
+        <h2>Sales Calculator</h2>
 
         <label for="cost">
             Cost per stock (₹)
@@ -48,69 +39,34 @@
         >
 
 
-        <label for="days">
-            Number of days
-        </label>
-
-        <input
-            id="days"
-            type="number"
-            min="1"
-            max="366"
-            placeholder="e.g. 30"
-        >
-
-
-        <button id="start">
-            Start Calculator
-        </button>
-
-    </section>
-
-
-    <!-- =========================================
-         LIVE SALES ENTRY
-    ========================================== -->
-
-    <section class="card">
-
-        <h2>Live Sales</h2>
-
-        <p>
-            Add the quantity whenever a sale happens.
-        </p>
-
-
-        <h3 id="realTimeDay">
+        <h3 id="currentDay">
             Sales Day 1
         </h3>
 
 
-        <label for="realTimeQuantity">
-            Quantity Sold
+        <label for="quantity">
+            Stocks Sold
         </label>
 
         <input
-            id="realTimeQuantity"
+            id="quantity"
             type="number"
             min="1"
             step="1"
-            placeholder="Enter quantity sold"
+            placeholder="Enter stocks sold"
         >
 
 
-        <button id="addRealTimeSale">
+        <button id="addSale">
             Add Sale
         </button>
 
 
-        <div class="daily-live-total">
+        <div class="daily-total">
 
-            <h3>
-                Today's Total
-            </h3>
+            <h3>Today's Total</h3>
 
-            <p id="realTimeTotal">
+            <p id="todayTotal">
                 0 stocks = ₹0.00
             </p>
 
@@ -120,41 +76,35 @@
 
 
     <!-- =========================================
-         DAILY SALES
-    ========================================== -->
-
-    <section
-        id="dailySection"
-        class="card hidden"
-    >
-
-        <h2>Daily Sales</h2>
-
-        <p>
-            Your sales for each day are shown separately below.
-        </p>
-
-        <div id="dailyInputs"></div>
-
-        <button id="calculate">
-            Calculate Total
-        </button>
-
-    </section>
-
-
-    <!-- =========================================
-         SALES HISTORY
+         AUTOMATIC REAL-TIME SALES TRACKER
     ========================================== -->
 
     <section class="card">
 
-        <h2>Sales History</h2>
+        <h2>Real-Time Sales Tracker</h2>
 
-        <div id="realTimeHistory">
+        <p>
+            Sales entered above are automatically recorded here.
+        </p>
+
+
+        <div id="salesHistory">
 
             <p>
                 No sales recorded yet.
+            </p>
+
+        </div>
+
+
+        <!-- GRAND TOTAL -->
+
+        <div id="grandTotal" class="grand-total">
+
+            <h2>Grand Total</h2>
+
+            <p>
+                0 stocks = ₹0.00
             </p>
 
         </div>
@@ -163,32 +113,13 @@
 
 
     <!-- =========================================
-         GRAND TOTAL
-    ========================================== -->
-
-    <section
-        id="result"
-        class="card result hidden"
-    ></section>
-
-
-    <!-- =========================================
-         CLEAR EVERYTHING
+         CLEAR SALES
     ========================================== -->
 
     <button
-        id="clear"
-        class="secondary"
-    >
-        Clear Calculator
-    </button>
-
-
-    <button
-        id="clearRealTimeSales"
-        class="secondary"
-    >
-        Clear Sales History
+        id="clearSales"
+        class="secondary">
+        Clear All Sales
     </button>
 
 </main>
