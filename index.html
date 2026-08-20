@@ -1,51 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <meta
-        name="theme-color"
-        content="#1565c0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1565c0">
 
     <title>Store Sales Manager</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
 
-
 <body>
 
 <main class="app">
 
-    <!-- HEADER -->
-
     <header>
         <h1>Store Sales Manager</h1>
-
-        <p>
-            Manage products, customers and daily sales.
-        </p>
+        <p>Manage products, customers and daily sales.</p>
     </header>
 
 
-    <!-- =========================================
-         PRODUCTS
-    ========================================== -->
+    <!-- ==============================
+         PRODUCT SECTION
+    =============================== -->
 
     <section class="card">
 
         <h2>📦 Products</h2>
-
-        <p>
-            Add your products and save their prices.
-        </p>
 
         <label for="productName">
             Product Name
@@ -58,7 +39,7 @@
         >
 
         <label for="productPrice">
-            Price (₹)
+            Price per item (₹)
         </label>
 
         <input
@@ -69,7 +50,9 @@
             placeholder="Example: 50"
         >
 
-        <button id="addProduct">
+        <button
+            type="button"
+            id="addProduct">
             Add Product
         </button>
 
@@ -80,17 +63,13 @@
     </section>
 
 
-    <!-- =========================================
-         REGULAR CUSTOMERS
-    ========================================== -->
+    <!-- ==============================
+         CUSTOMER SECTION
+    =============================== -->
 
     <section class="card">
 
         <h2>👤 Regular Customers</h2>
-
-        <p>
-            Add customers who regularly buy from your store.
-        </p>
 
         <label for="customerName">
             Customer Name
@@ -102,55 +81,65 @@
             placeholder="Example: Abhi"
         >
 
-        <button id="addCustomer">
+        <button
+            type="button"
+            id="addCustomer">
             Add Customer
         </button>
 
         <div id="customerList">
-            <p>No regular customers added yet.</p>
+            <p>No customers added yet.</p>
         </div>
 
     </section>
 
 
-    <!-- =========================================
-         RECORD SALE
-    ========================================== -->
+    <!-- ==============================
+         SALES ENTRY
+    =============================== -->
 
     <section class="card">
 
-        <h2>🧾 Record Sale</h2>
+        <h2>🧾 Enter Sale</h2>
 
         <h3 id="currentDay">
             Sales Day 1
         </h3>
+
+
+        <label for="saleCustomer">
+            Customer
+        </label>
+
+        <select id="saleCustomer">
+
+            <option value="">
+                Walk-in / No Regular Customer
+            </option>
+
+        </select>
+
 
         <label for="saleProduct">
             Product
         </label>
 
         <select id="saleProduct">
+
             <option value="">
                 Select Product
             </option>
-        </select>
-
-
-        <label for="saleCustomer">
-            Regular Customer
-        </label>
-
-        <select id="saleCustomer">
-
-            <option value="">
-                No Regular Customer
-            </option>
 
         </select>
+
+
+        <p id="selectedPrice">
+            Price: ₹0.00
+        </p>
 
 
         <label for="saleQuantity">
-            Quantity
+            Quantity Sold
         </label>
 
         <input
@@ -161,24 +150,24 @@
             placeholder="Enter quantity"
         >
 
-        <p id="selectedPrice">
-            Price: ₹0.00
-        </p>
 
         <p id="saleAmount">
             Sale Amount: ₹0.00
         </p>
 
-        <button id="addSale">
+
+        <button
+            type="button"
+            id="addSale">
             Add Sale
         </button>
 
     </section>
 
 
-    <!-- =========================================
+    <!-- ==============================
          DAILY SALES
-    ========================================== -->
+    =============================== -->
 
     <section class="card">
 
@@ -191,13 +180,13 @@
     </section>
 
 
-    <!-- =========================================
+    <!-- ==============================
          CUSTOMER SALES
-    ========================================== -->
+    =============================== -->
 
     <section class="card">
 
-        <h2>👥 Regular Customer Sales</h2>
+        <h2>👥 Customer Sales</h2>
 
         <div id="customerSales">
             <p>No customer sales recorded yet.</p>
@@ -206,18 +195,15 @@
     </section>
 
 
-    <!-- =========================================
-         OVERALL STORE TOTAL
-    ========================================== -->
+    <!-- ==============================
+         STORE TOTAL
+    =============================== -->
 
     <section
         class="card result"
-        id="overallTotal"
-    >
+        id="overallTotal">
 
-        <h2>
-            💰 Overall Store Total
-        </h2>
+        <h2>💰 Store Grand Total</h2>
 
         <p>
             0 items = ₹0.00
@@ -226,15 +212,17 @@
     </section>
 
 
-    <!-- =========================================
+    <!-- ==============================
          CLEAR SALES
-    ========================================== -->
+    =============================== -->
 
     <button
+        type="button"
         id="clearAll"
-        class="secondary"
-    >
-        Clear All Sales Data
+        class="secondary">
+
+        Clear All Sales
+
     </button>
 
 </main>
@@ -243,5 +231,4 @@
 <script src="script.js"></script>
 
 </body>
-
-        </html>
+</html>
