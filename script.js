@@ -1,6 +1,12 @@
 // =====================================================
-// COMBINED SALES CALCULATOR
-// + AUTOMATIC REAL-TIME SALES TRACKER
+// STORE SALES MANAGEMENT SYSTEM
+// =====================================================
+// Products
+// Prices
+// Regular Customers
+// Daily Sales
+// Individual Customer History
+// Individual Customer Overall Total
 // =====================================================
 
 
@@ -8,77 +14,106 @@
 // GET HTML ELEMENTS
 // =====================================================
 
-const costInput =
-    document.getElementById("cost");
+const productNameInput =
+    document.getElementById("productName");
 
-const quantityInput =
-    document.getElementById("quantity");
+const productPriceInput =
+    document.getElementById("productPrice");
+
+const addProductButton =
+    document.getElementById("addProduct");
+
+const productList =
+    document.getElementById("productList");
+
+
+const customerNameInput =
+    document.getElementById("customerName");
+
+const addCustomerButton =
+    document.getElementById("addCustomer");
+
+const customerList =
+    document.getElementById("customerList");
+
+
+const saleProduct =
+    document.getElementById("saleProduct");
+
+const saleCustomer =
+    document.getElementById("saleCustomer");
+
+const saleQuantity =
+    document.getElementById("saleQuantity");
+
+const selectedPrice =
+    document.getElementById("selectedPrice");
+
+const saleAmount =
+    document.getElementById("saleAmount");
 
 const addSaleButton =
     document.getElementById("addSale");
 
+
 const currentDayDisplay =
     document.getElementById("currentDay");
 
-const todayTotalDisplay =
-    document.getElementById("todayTotal");
+const dailySales =
+    document.getElementById("dailySales");
 
-const salesHistory =
-    document.getElementById("salesHistory");
+const customerSales =
+    document.getElementById("customerSales");
 
-const grandTotalDisplay =
-    document.getElementById("grandTotal");
+const overallTotal =
+    document.getElementById("overallTotal");
 
-const clearSalesButton =
-    document.getElementById("clearSales");
+const clearAllButton =
+    document.getElementById("clearAll");
 
 
 // =====================================================
-// LOAD SAVED COST
+// LOAD SAVED DATA
 // =====================================================
 
-const savedCost =
-    localStorage.getItem("salesCost");
+let products = [];
+let customers = [];
+let sales = [];
 
 
-if (savedCost !== null) {
+try {
 
-    costInput.value = savedCost;
+    products =
+        JSON.parse(
+            localStorage.getItem("storeProducts")
+        ) || [];
+
+} catch (error) {
+
+    products = [];
 
 }
 
 
-// =====================================================
-// SAVE COST
-// =====================================================
+try {
 
-costInput.addEventListener(
-    "input",
-    function () {
+    customers =
+        JSON.parse(
+            localStorage.getItem("storeCustomers")
+        ) || [];
 
-        localStorage.setItem(
-            "salesCost",
-            costInput.value
-        );
+} catch (error) {
 
-        displayAllSales();
+    customers = [];
 
-    }
-);
-
-
-// =====================================================
-// LOAD SAVED SALES
-// =====================================================
-
-let sales = [];
+}
 
 
 try {
 
     sales =
         JSON.parse(
-            localStorage.getItem("salesData")
+            localStorage.getItem("storeSales")
         ) || [];
 
 } catch (error) {
@@ -89,22 +124,713 @@ try {
 
 
 // =====================================================
-// GET DATE ONLY
+// SAVE FUNCTIONS
 // =====================================================
 
-function getDateOnly(date) {
+function saveProducts() {
 
-    return new Date(
-        date.getFullYear(),
-        date.getMonth(),
-        date.getDate()
+    localStorage.setItem(
+        "storeProducts",
+        JSON.stringify(products)
+    );
+
+}
+
+
+function saveCustomers() {
+
+    localStorage.setItem(
+        "storeCustomers",
+        JSON.stringify(customers)
+    );
+
+}
+
+
+function saveSales() {
+
+    localStorage.setItem(
+        "storeSales",
+        JSON.stringify(sales)
     );
 
 }
 
 
 // =====================================================
-// GET FIRST SALES DATE
+// CREATE UNIQUE ID
+// =====================================================
+
+function createId() {
+
+    return (
+        Date.now().toString() +
+        Math.random()
+            .toString(36)
+            .substring(2)
+    );
+
+}
+
+
+// =====================================================
+// ADD PRODUCT
+// =====================================================
+
+function addProduct() {
+
+    const name =
+        productNameInput.value.trim();
+
+    const price =
+        Number(
+            productPriceInput.value
+        );
+
+
+    if (name === "") {
+
+        alert(
+            "Enter a product name."
+        );
+
+        productNameInput.focus();
+
+        return;
+
+    }
+
+
+    if (
+        !Number.isFinite(price) ||
+        price < 0
+    ) {
+
+        alert(
+            "Enter a valid product price."
+        );
+
+        productPriceInput.focus();
+
+        return;
+
+    }
+
+
+    const alreadyExists =
+        products.some(
+            product =>
+                product.name.toLowerCase()
+                === name.toLowerCase()
+        );
+
+
+    if (alreadyExists) {
+
+        alert(
+            "This product already exists."
+        );
+
+        return;
+
+    }
+
+
+    products.push({
+
+        id: createId(),
+
+        name: name,
+
+        price: price
+
+    });
+
+
+    saveProducts();
+
+
+    productNameInput.value = "";
+    productPriceInput.value = "";
+
+
+    displayProducts();
+    updateProductDropdown();
+
+}
+
+
+// =====================================================
+// DISPLAY PRODUCTS
+// =====================================================
+
+function displayProducts() {
+
+    productList.innerHTML = "";
+
+
+    if (products.length === 0) {
+
+        productList.innerHTML =
+            "<p>No products added yet.</p>";
+
+        return;
+
+    }
+
+
+    products.forEach(
+        function(product) {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "product-item";
+
+
+            const text =
+                document.createElement("p");
+
+
+            text.textContent =
+                product.name +
+                " — ₹" +
+                product.price.toFixed(2);
+
+
+            const editButton =
+                document.createElement("button");
+
+
+            editButton.textContent =
+                "Edit Price";
+
+
+            editButton.addEventListener(
+                "click",
+                function() {
+
+                    editProductPrice(
+                        product.id
+                    );
+
+                }
+            );
+
+
+            const deleteButton =
+                document.createElement("button");
+
+
+            deleteButton.textContent =
+                "Delete";
+
+
+            deleteButton.className =
+                "secondary";
+
+
+            deleteButton.addEventListener(
+                "click",
+                function() {
+
+                    deleteProduct(
+                        product.id
+                    );
+
+                }
+            );
+
+
+            box.append(
+                text,
+                editButton,
+                deleteButton
+            );
+
+
+            productList.appendChild(
+                box
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// EDIT PRODUCT PRICE
+// =====================================================
+
+function editProductPrice(productId) {
+
+    const product =
+        products.find(
+            item =>
+                item.id === productId
+        );
+
+
+    if (!product) {
+        return;
+    }
+
+
+    const newPrice =
+        prompt(
+            "Enter new price for " +
+            product.name,
+            product.price
+        );
+
+
+    if (newPrice === null) {
+        return;
+    }
+
+
+    const price =
+        Number(newPrice);
+
+
+    if (
+        !Number.isFinite(price) ||
+        price < 0
+    ) {
+
+        alert(
+            "Enter a valid price."
+        );
+
+        return;
+
+    }
+
+
+    product.price = price;
+
+
+    saveProducts();
+
+
+    displayProducts();
+    updateProductDropdown();
+    updateSaleCalculation();
+
+}
+
+
+// =====================================================
+// DELETE PRODUCT
+// =====================================================
+
+function deleteProduct(productId) {
+
+    const product =
+        products.find(
+            item =>
+                item.id === productId
+        );
+
+
+    if (!product) {
+        return;
+    }
+
+
+    const confirmation =
+        confirm(
+            "Delete " +
+            product.name +
+            " from the product list?"
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    products =
+        products.filter(
+            item =>
+                item.id !== productId
+        );
+
+
+    saveProducts();
+
+
+    displayProducts();
+    updateProductDropdown();
+
+}
+
+
+// =====================================================
+// PRODUCT DROPDOWN
+// =====================================================
+
+function updateProductDropdown() {
+
+    saleProduct.innerHTML = "";
+
+    const defaultOption =
+        document.createElement("option");
+
+    defaultOption.value = "";
+
+    defaultOption.textContent =
+        "Select Product";
+
+    saleProduct.appendChild(
+        defaultOption
+    );
+
+
+    products.forEach(
+        function(product) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                product.id;
+
+            option.textContent =
+                product.name;
+
+            saleProduct.appendChild(
+                option
+            );
+
+        }
+    );
+
+
+    updateSaleCalculation();
+
+}
+
+
+// =====================================================
+// ADD CUSTOMER
+// =====================================================
+
+function addCustomer() {
+
+    const name =
+        customerNameInput.value.trim();
+
+
+    if (name === "") {
+
+        alert(
+            "Enter a customer name."
+        );
+
+        customerNameInput.focus();
+
+        return;
+
+    }
+
+
+    const alreadyExists =
+        customers.some(
+            customer =>
+                customer.name.toLowerCase()
+                === name.toLowerCase()
+        );
+
+
+    if (alreadyExists) {
+
+        alert(
+            "This customer already exists."
+        );
+
+        return;
+
+    }
+
+
+    customers.push({
+
+        id: createId(),
+
+        name: name
+
+    });
+
+
+    saveCustomers();
+
+
+    customerNameInput.value = "";
+
+
+    displayCustomers();
+    updateCustomerDropdown();
+
+}
+
+
+// =====================================================
+// DISPLAY CUSTOMERS
+// =====================================================
+
+function displayCustomers() {
+
+    customerList.innerHTML = "";
+
+
+    if (customers.length === 0) {
+
+        customerList.innerHTML =
+            "<p>No regular customers added yet.</p>";
+
+        return;
+
+    }
+
+
+    customers.forEach(
+        function(customer) {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "customer-item";
+
+
+            const text =
+                document.createElement("p");
+
+            text.textContent =
+                customer.name;
+
+
+            const deleteButton =
+                document.createElement("button");
+
+            deleteButton.textContent =
+                "Delete";
+
+            deleteButton.className =
+                "secondary";
+
+
+            deleteButton.addEventListener(
+                "click",
+                function() {
+
+                    deleteCustomer(
+                        customer.id
+                    );
+
+                }
+            );
+
+
+            box.append(
+                text,
+                deleteButton
+            );
+
+
+            customerList.appendChild(
+                box
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// DELETE CUSTOMER
+// =====================================================
+
+function deleteCustomer(customerId) {
+
+    const customer =
+        customers.find(
+            item =>
+                item.id === customerId
+        );
+
+
+    if (!customer) {
+        return;
+    }
+
+
+    const confirmation =
+        confirm(
+            "Delete " +
+            customer.name +
+            " from the customer list?"
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    customers =
+        customers.filter(
+            item =>
+                item.id !== customerId
+        );
+
+
+    saveCustomers();
+
+
+    displayCustomers();
+    updateCustomerDropdown();
+
+}
+
+
+// =====================================================
+// CUSTOMER DROPDOWN
+// =====================================================
+
+function updateCustomerDropdown() {
+
+    saleCustomer.innerHTML = "";
+
+
+    const defaultOption =
+        document.createElement("option");
+
+    defaultOption.value = "";
+
+    defaultOption.textContent =
+        "No Regular Customer";
+
+    saleCustomer.appendChild(
+        defaultOption
+    );
+
+
+    customers.forEach(
+        function(customer) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                customer.id;
+
+            option.textContent =
+                customer.name;
+
+            saleCustomer.appendChild(
+                option
+            );
+
+        }
+    );
+
+}
+
+
+// =====================================================
+// UPDATE AUTOMATIC PRICE
+// =====================================================
+
+function updateSaleCalculation() {
+
+    const productId =
+        saleProduct.value;
+
+
+    const quantity =
+        Number(
+            saleQuantity.value
+        );
+
+
+    const product =
+        products.find(
+            item =>
+                item.id === productId
+        );
+
+
+    if (!product) {
+
+        selectedPrice.textContent =
+            "Price: ₹0.00";
+
+        saleAmount.textContent =
+            "Sale Amount: ₹0.00";
+
+        return;
+
+    }
+
+
+    selectedPrice.textContent =
+        "Price: ₹" +
+        product.price.toFixed(2);
+
+
+    if (
+        !Number.isFinite(quantity) ||
+        quantity <= 0
+    ) {
+
+        saleAmount.textContent =
+            "Sale Amount: ₹0.00";
+
+        return;
+
+    }
+
+
+    const amount =
+        quantity * product.price;
+
+
+    saleAmount.textContent =
+        "Sale Amount: ₹" +
+        amount.toFixed(2);
+
+}
+
+
+// =====================================================
+// GET DATE
+// =====================================================
+
+function getDateOnly(date) {
+
+    return (
+        date.getFullYear() +
+        "-" +
+        String(
+            date.getMonth() + 1
+        ).padStart(2, "0") +
+        "-" +
+        String(
+            date.getDate()
+        ).padStart(2, "0")
+    );
+
+}
+
+
+// =====================================================
+// FIRST SALES DATE
 // =====================================================
 
 function getFirstSalesDate() {
@@ -118,113 +844,49 @@ function getFirstSalesDate() {
     }
 
 
-    return getDateOnly(
+    return sales[0].date;
+
+}
+
+
+// =====================================================
+// GET SALES DAY NUMBER
+// =====================================================
+
+function getSalesDayNumber(dateString) {
+
+    const firstDate =
         new Date(
-            sales[0].time
-        )
-    );
-
-}
+            getFirstSalesDate()
+            + "T00:00:00"
+        );
 
 
-// =====================================================
-// GET CURRENT SALES DAY
-// =====================================================
-
-function getCurrentSalesDay() {
-
-    if (sales.length === 0) {
-
-        return 1;
-
-    }
-
-
-    const firstDate =
-        getFirstSalesDate();
-
-
-    const today =
-        getDateOnly(
-            new Date()
+    const currentDate =
+        new Date(
+            dateString
+            + "T00:00:00"
         );
 
 
     const difference =
-        today - firstDate;
+        currentDate -
+        firstDate;
 
 
     const oneDay =
-        24 * 60 * 60 * 1000;
+        24 *
+        60 *
+        60 *
+        1000;
 
 
     return (
         Math.floor(
-            difference / oneDay
+            difference /
+            oneDay
         ) + 1
     );
-
-}
-
-
-// =====================================================
-// GET DAY NUMBER OF A SALE
-// =====================================================
-
-function getSaleDay(sale) {
-
-    const firstDate =
-        getFirstSalesDate();
-
-
-    const saleDate =
-        getDateOnly(
-            new Date(
-                sale.time
-            )
-        );
-
-
-    const difference =
-        saleDate - firstDate;
-
-
-    const oneDay =
-        24 * 60 * 60 * 1000;
-
-
-    return (
-        Math.floor(
-            difference / oneDay
-        ) + 1
-    );
-
-}
-
-
-// =====================================================
-// GET COST
-// =====================================================
-
-function getCost() {
-
-    const cost =
-        Number(
-            costInput.value
-        );
-
-
-    if (
-        !Number.isFinite(cost) ||
-        cost < 0
-    ) {
-
-        return 0;
-
-    }
-
-
-    return cost;
 
 }
 
@@ -235,13 +897,39 @@ function getCost() {
 
 function addSale() {
 
+    const productId =
+        saleProduct.value;
+
+
+    const customerId =
+        saleCustomer.value;
+
+
     const quantity =
         Number(
-            quantityInput.value
+            saleQuantity.value
         );
 
 
-    // Check quantity
+    const product =
+        products.find(
+            item =>
+                item.id === productId
+        );
+
+
+    if (!product) {
+
+        alert(
+            "Select a product."
+        );
+
+        saleProduct.focus();
+
+        return;
+
+    }
+
 
     if (
         !Number.isInteger(quantity) ||
@@ -249,79 +937,110 @@ function addSale() {
     ) {
 
         alert(
-            "Enter a valid number of stocks sold."
+            "Enter a valid quantity."
         );
 
-        quantityInput.focus();
+        saleQuantity.focus();
 
         return;
 
     }
 
 
-    // Check cost
-
-    const cost =
-        Number(
-            costInput.value
-        );
+    let customer = null;
 
 
-    if (
-        !Number.isFinite(cost) ||
-        cost < 0
-    ) {
+    if (customerId !== "") {
 
-        alert(
-            "Enter the cost per stock first."
-        );
-
-        costInput.focus();
-
-        return;
+        customer =
+            customers.find(
+                item =>
+                    item.id === customerId
+            );
 
     }
 
 
-    // Create the sale
+    const now =
+        new Date();
+
+
+    const date =
+        getDateOnly(now);
+
+
+    /*
+     IMPORTANT:
+
+     The price is saved with the sale.
+
+     Example:
+
+     Day 1 Shampoo = ₹50
+
+     Later price becomes ₹55.
+
+     Day 1 remains ₹50.
+    */
+
 
     const sale = {
 
-        quantity: quantity,
+        id: createId(),
+
+        date: date,
 
         time:
-            new Date().toISOString()
+            now.toISOString(),
+
+        day:
+            getSalesDayNumber(date),
+
+        productId:
+            product.id,
+
+        productName:
+            product.name,
+
+        price:
+            product.price,
+
+        quantity:
+            quantity,
+
+        amount:
+            product.price *
+            quantity,
+
+        customerId:
+            customer
+                ? customer.id
+                : "",
+
+        customerName:
+            customer
+                ? customer.name
+                : ""
 
     };
 
 
-    // Save in memory
-
     sales.push(sale);
 
 
-    // Save permanently in browser
-
-    localStorage.setItem(
-        "salesData",
-        JSON.stringify(sales)
-    );
+    saveSales();
 
 
-    // Clear the ONE input
-
-    quantityInput.value = "";
+    saleQuantity.value = "";
 
 
-    // Automatically update calculator
-    // and real-time tracker
-
-    displayAllSales();
+    displayAll();
 
 
-    // Ready for next sale
+    updateSaleCalculation();
 
-    quantityInput.focus();
+
+    saleQuantity.focus();
 
 }
 
@@ -330,407 +1049,195 @@ function addSale() {
 // DISPLAY EVERYTHING
 // =====================================================
 
-function displayAllSales() {
+function displayAll() {
 
-    const cost =
-        getCost();
+    displayCurrentDay();
+
+    displayDailySales();
+
+    displayCustomerSales();
+
+    displayOverallTotal();
+
+}
 
 
-    const currentDay =
-        getCurrentSalesDay();
+// =====================================================
+// CURRENT DAY
+// =====================================================
+
+function displayCurrentDay() {
+
+    const today =
+        getDateOnly(
+            new Date()
+        );
 
 
-    // =================================================
-    // CURRENT DAY
-    // =================================================
+    const day =
+        getSalesDayNumber(
+            today
+        );
+
 
     currentDayDisplay.textContent =
         "Sales Day " +
-        currentDay;
+        day;
+
+}
 
 
-    // =================================================
-    // TODAY'S TOTAL
-    // =================================================
+// =====================================================
+// DAILY SALES
+// =====================================================
 
-    let todayQuantity = 0;
+function displayDailySales() {
 
+    dailySales.innerHTML = "";
 
-    sales.forEach(
-        function (sale) {
-
-            if (
-                getSaleDay(sale)
-                === currentDay
-            ) {
-
-                todayQuantity +=
-                    Number(
-                        sale.quantity
-                    );
-
-            }
-
-        }
-    );
-
-
-    const todayAmount =
-        todayQuantity * cost;
-
-
-    todayTotalDisplay.textContent =
-        todayQuantity +
-        " stocks = ₹" +
-        todayAmount.toFixed(2);
-
-
-    // =================================================
-    // CLEAR HISTORY DISPLAY
-    // =================================================
-
-    salesHistory.innerHTML = "";
-
-
-    // =================================================
-    // NO SALES
-    // =================================================
 
     if (sales.length === 0) {
 
-        salesHistory.innerHTML =
+        dailySales.innerHTML =
             "<p>No sales recorded yet.</p>";
-
-        updateGrandTotal();
 
         return;
 
     }
 
 
-    // =================================================
-    // FIND LAST DAY
-    // =================================================
-
-    let highestDay = 1;
+    const days = {};
 
 
     sales.forEach(
-        function (sale) {
+        function(sale) {
 
-            const day =
-                getSaleDay(sale);
+            if (!days[sale.day]) {
 
-
-            if (
-                day > highestDay
-            ) {
-
-                highestDay = day;
+                days[sale.day] = [];
 
             }
+
+
+            days[sale.day].push(
+                sale
+            );
 
         }
     );
 
 
-    // =================================================
-    // DISPLAY EACH DAY SEPARATELY
-    // =================================================
-
-    for (
-        let day = 1;
-        day <= highestDay;
-        day++
-    ) {
+    const dayNumbers =
+        Object.keys(days)
+            .map(Number)
+            .sort(
+                (a, b) =>
+                    a - b
+            );
 
 
-        const daySales =
-            sales.filter(
-                function (sale) {
+    dayNumbers.forEach(
+        function(day) {
 
-                    return (
-                        getSaleDay(sale)
-                        === day
-                    );
+            const dayBox =
+                document.createElement(
+                    "div"
+                );
+
+
+            dayBox.className =
+                "real-time-day";
+
+
+            const heading =
+                document.createElement(
+                    "h3"
+                );
+
+
+            heading.textContent =
+                "Sales Day " +
+                day;
+
+
+            dayBox.appendChild(
+                heading
+            );
+
+
+            const productGroups = {};
+
+
+            let dayTotal = 0;
+
+            let dayQuantity = 0;
+
+
+            days[day].forEach(
+                function(sale) {
+
+                    dayTotal +=
+                        sale.amount;
+
+
+                    dayQuantity +=
+                        sale.quantity;
+
+
+                    if (
+                        !productGroups[
+                            sale.productName
+                        ]
+                    ) {
+
+                        productGroups[
+                            sale.productName
+                        ] = {
+
+                            quantity: 0,
+
+                            amount: 0
+
+                        };
+
+                    }
+
+
+                    productGroups[
+                        sale.productName
+                    ].quantity +=
+                        sale.quantity;
+
+
+                    productGroups[
+                        sale.productName
+                    ].amount +=
+                        sale.amount;
 
                 }
             );
 
 
-        if (
-            daySales.length === 0
-        ) {
-
-            continue;
-
-        }
-
-
-        // =============================================
-        // DAY BOX
-        // =============================================
-
-        const dayBox =
-            document.createElement(
-                "div"
-            );
-
-
-        dayBox.className =
-            "real-time-day";
-
-
-        // =============================================
-        // DAY HEADING
-        // =============================================
-
-        const heading =
-            document.createElement(
-                "h3"
-            );
-
-
-        heading.textContent =
-            "Sales Day " +
-            day;
-
-
-        dayBox.appendChild(
-            heading
-        );
-
-
-        // =============================================
-        // DAY TOTAL
-        // =============================================
-
-        let dayQuantity = 0;
-
-
-        daySales.forEach(
-            function (sale) {
-
-                dayQuantity +=
-                    Number(
-                        sale.quantity
-                    );
-
-            }
-        );
-
-
-        const dayAmount =
-            dayQuantity * cost;
-
-
-        const dayTotal =
-            document.createElement(
-                "p"
-            );
-
-
-        dayTotal.innerHTML =
-            "<strong>" +
-            dayQuantity +
-            " stocks</strong> = ₹" +
-            dayAmount.toFixed(2);
-
-
-        dayBox.appendChild(
-            dayTotal
-        );
-
-
-        // =============================================
-        // INDIVIDUAL SALES
-        // =============================================
-
-        daySales.forEach(
-            function (sale) {
-
-                const entry =
-                    document.createElement(
-                        "p"
-                    );
-
-
-                const time =
-                    new Date(
-                        sale.time
-                    );
-
-
-                entry.textContent =
-                    time.toLocaleTimeString() +
-                    " → " +
-                    sale.quantity +
-                    " stocks";
-
-
-                dayBox.appendChild(
-                    entry
-                );
-
-            }
-        );
-
-
-        // =============================================
-        // ADD TO TRACKER
-        // =============================================
-
-        salesHistory.appendChild(
-            dayBox
-        );
-
-    }
-
-
-    // =================================================
-    // GRAND TOTAL
-    // =================================================
-
-    updateGrandTotal();
-
-}
-
-
-// =====================================================
-// GRAND TOTAL
-// =====================================================
-
-function updateGrandTotal() {
-
-    let totalQuantity = 0;
-
-
-    sales.forEach(
-        function (sale) {
-
-            totalQuantity +=
-                Number(
-                    sale.quantity
-                );
-
-        }
-    );
-
-
-    const cost =
-        getCost();
-
-
-    const totalAmount =
-        totalQuantity * cost;
-
-
-    grandTotalDisplay.innerHTML = `
-
-        <h2>Grand Total</h2>
-
-        <p>
-            <strong>
-                ${totalQuantity} stocks
-            </strong>
-            = ₹${totalAmount.toFixed(2)}
-        </p>
-
-    `;
-
-}
-
-
-// =====================================================
-// ADD SALE BUTTON
-// =====================================================
-
-addSaleButton.addEventListener(
-    "click",
-    addSale
-);
-
-
-// =====================================================
-// ENTER KEY ALSO ADDS SALE
-// =====================================================
-
-quantityInput.addEventListener(
-    "keydown",
-    function (event) {
-
-        if (
-            event.key === "Enter"
-        ) {
-
-            addSale();
-
-        }
-
-    }
-);
-
-
-// =====================================================
-// CLEAR ALL SALES
-// =====================================================
-
-clearSalesButton.addEventListener(
-    "click",
-    function () {
-
-        if (
-            sales.length === 0
-        ) {
-
-            return;
-
-        }
-
-
-        const confirmation =
-            confirm(
-                "Are you sure you want to delete all saved sales?"
-            );
-
-
-        if (!confirmation) {
-
-            return;
-
-        }
-
-
-        // Delete sales
-
-        sales = [];
-
-
-        localStorage.removeItem(
-            "salesData"
-        );
-
-
-        // Update screen
-
-        displayAllSales();
-
-    }
-);
-
-
-// =====================================================
-// INITIAL LOAD
-// =====================================================
-
-displayAllSales();
-
-
-// =====================================================
-// CHECK FOR NEW DAY EVERY MINUTE
-// =====================================================
-
-setInterval(
-    displayAllSales,
-    60000
-);
+            Object.keys(
+                productGroups
+            ).forEach(
+                function(productName) {
+
+                    const group =
+                        productGroups[
+                            productName
+                        ];
+
+
+                    const row =
+                        document.createElement(
+                            "p"
+                        );
+
+
+                    row.textContent =
+                        productName +
+                        " → " +
+                        group.quantity +
+                        " stocks = ₹" +
+             
