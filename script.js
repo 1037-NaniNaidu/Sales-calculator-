@@ -1,6 +1,6 @@
 // =====================================================
 // STORE SALES MANAGER
-// COMPLETE WORKING VERSION
+// COMPLETE FINAL WORKING SCRIPT
 // =====================================================
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -34,6 +34,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =================================================
+    // CHECK HTML ELEMENTS
+    // =================================================
+
+    if (
+        !productName ||
+        !productPrice ||
+        !addProductButton ||
+        !productList ||
+        !customerName ||
+        !addCustomerButton ||
+        !customerList ||
+        !saleCustomer ||
+        !saleProduct ||
+        !saleQuantity ||
+        !selectedPrice ||
+        !saleAmount ||
+        !addSaleButton ||
+        !currentDay ||
+        !dailySales ||
+        !customerSales ||
+        !overallTotal ||
+        !clearAll
+    ) {
+        console.error(
+            "Store Sales Manager: One or more HTML elements are missing."
+        );
+
+        alert(
+            "There is an HTML connection problem. Please make sure you are using the correct index.html."
+        );
+
+        return;
+    }
+
+
+    // =================================================
     // LOAD DATA SAFELY
     // =================================================
 
@@ -41,29 +77,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
         try {
 
-            const saved = localStorage.getItem(key);
+            const savedData =
+                localStorage.getItem(key);
 
-            if (!saved) {
+            if (!savedData) {
                 return [];
             }
 
-            const data = JSON.parse(saved);
+            const parsedData =
+                JSON.parse(savedData);
 
-            return Array.isArray(data) ? data : [];
-
-        } catch (error) {
-
-            console.error("Error loading " + key, error);
+            if (Array.isArray(parsedData)) {
+                return parsedData;
+            }
 
             return [];
 
+        } catch (error) {
+
+            console.error(
+                "Error loading " + key,
+                error
+            );
+
+            return [];
         }
     }
 
 
-    let products = loadData("storeProducts");
-    let customers = loadData("storeCustomers");
-    let sales = loadData("storeSales");
+    let products =
+        loadData("storeProducts");
+
+    let customers =
+        loadData("storeCustomers");
+
+    let sales =
+        loadData("storeSales");
 
 
     // =================================================
@@ -76,7 +125,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "storeProducts",
             JSON.stringify(products)
         );
-
     }
 
 
@@ -86,7 +134,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "storeCustomers",
             JSON.stringify(customers)
         );
-
     }
 
 
@@ -96,7 +143,6 @@ document.addEventListener("DOMContentLoaded", function () {
             "storeSales",
             JSON.stringify(sales)
         );
-
     }
 
 
@@ -113,12 +159,11 @@ document.addEventListener("DOMContentLoaded", function () {
                 .toString(36)
                 .substring(2)
         );
-
     }
 
 
     // =================================================
-    // DATE
+    // GET TODAY'S DATE
     // =================================================
 
     function getDateString(date) {
@@ -126,42 +171,52 @@ document.addEventListener("DOMContentLoaded", function () {
         return (
             date.getFullYear() +
             "-" +
-            String(date.getMonth() + 1).padStart(2, "0") +
+            String(
+                date.getMonth() + 1
+            ).padStart(2, "0") +
             "-" +
-            String(date.getDate()).padStart(2, "0")
+            String(
+                date.getDate()
+            ).padStart(2, "0")
         );
-
     }
 
 
     // =================================================
-    // FIRST SALES DATE
+    // GET FIRST SALES DATE
     // =================================================
 
     function getFirstSalesDate() {
 
         if (sales.length === 0) {
 
-            return getDateString(new Date());
-
+            return getDateString(
+                new Date()
+            );
         }
 
 
-        const dates = sales
-            .map(sale => sale.date)
-            .filter(date => date)
-            .sort();
+        const dates =
+            sales
+                .map(
+                    sale => sale.date
+                )
+                .filter(
+                    date =>
+                        typeof date === "string"
+                )
+                .sort();
 
 
         if (dates.length === 0) {
 
-            return getDateString(new Date());
-
+            return getDateString(
+                new Date()
+            );
         }
 
 
         return dates[0];
-
     }
 
 
@@ -195,7 +250,27 @@ document.addEventListener("DOMContentLoaded", function () {
                 (24 * 60 * 60 * 1000)
             ) + 1
         );
+    }
 
+
+    // =================================================
+    // UPDATE CURRENT DAY
+    // =================================================
+
+    function updateCurrentDay() {
+
+        const today =
+            getDateString(
+                new Date()
+            );
+
+
+        const day =
+            getSalesDay(today);
+
+
+        currentDay.textContent =
+            "Sales Day " + day;
     }
 
 
@@ -210,17 +285,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const price =
-            Number(productPrice.value);
+            Number(
+                productPrice.value
+            );
 
 
         if (name === "") {
 
-            alert("Please enter a product name.");
+            alert(
+                "Please enter a product name."
+            );
 
             productName.focus();
 
             return;
-
         }
 
 
@@ -230,41 +308,48 @@ document.addEventListener("DOMContentLoaded", function () {
             price < 0
         ) {
 
-            alert("Please enter a valid product price.");
+            alert(
+                "Please enter a valid product price."
+            );
 
             productPrice.focus();
 
             return;
-
         }
 
 
-        const exists =
+        const alreadyExists =
             products.some(
                 product =>
-                    product.name.toLowerCase() ===
+                    String(
+                        product.name
+                    ).toLowerCase() ===
                     name.toLowerCase()
             );
 
 
-        if (exists) {
+        if (alreadyExists) {
 
-            alert("This product already exists.");
+            alert(
+                "This product already exists."
+            );
 
             productName.focus();
 
             return;
-
         }
 
 
         products.push({
 
-            id: createId(),
+            id:
+                createId(),
 
-            name: name,
+            name:
+                name,
 
-            price: price
+            price:
+                price
 
         });
 
@@ -280,8 +365,13 @@ document.addEventListener("DOMContentLoaded", function () {
         updateProductDropdown();
 
 
-        productName.focus();
+        alert(
+            name +
+            " added successfully."
+        );
 
+
+        productName.focus();
     }
 
 
@@ -300,85 +390,104 @@ document.addEventListener("DOMContentLoaded", function () {
                 "<p>No products added yet.</p>";
 
             return;
-
         }
 
 
-        products.forEach(product => {
+        products.forEach(
+            product => {
 
-            const box =
-                document.createElement("div");
-
-
-            box.className = "product-item";
-
-
-            const text =
-                document.createElement("p");
+                const box =
+                    document.createElement(
+                        "div"
+                    );
 
 
-            text.textContent =
-                product.name +
-                " — ₹" +
-                Number(product.price).toFixed(2);
+                box.className =
+                    "product-item";
 
 
-            const deleteButton =
-                document.createElement("button");
+                const text =
+                    document.createElement(
+                        "p"
+                    );
 
 
-            deleteButton.type = "button";
+                text.textContent =
+                    product.name +
+                    " — ₹" +
+                    Number(
+                        product.price
+                    ).toFixed(2);
 
-            deleteButton.textContent = "Delete";
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
 
 
-            deleteButton.addEventListener(
-                "click",
-                function () {
+                deleteButton.type =
+                    "button";
 
-                    if (
-                        !confirm(
-                            "Delete " +
-                            product.name +
-                            "?"
-                        )
-                    ) {
 
-                        return;
+                deleteButton.textContent =
+                    "Delete";
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    function () {
+
+                        const confirmed =
+                            confirm(
+                                "Delete " +
+                                product.name +
+                                "?"
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        products =
+                            products.filter(
+                                item =>
+                                    item.id !==
+                                    product.id
+                            );
+
+
+                        saveProducts();
+
+
+                        displayProducts();
+
+                        updateProductDropdown();
 
                     }
+                );
 
 
-                    products =
-                        products.filter(
-                            item =>
-                                item.id !== product.id
-                        );
+                box.appendChild(text);
+
+                box.appendChild(
+                    deleteButton
+                );
 
 
-                    saveProducts();
+                productList.appendChild(
+                    box
+                );
 
-                    displayProducts();
-
-                    updateProductDropdown();
-
-                }
-            );
-
-
-            box.appendChild(text);
-
-            box.appendChild(deleteButton);
-
-            productList.appendChild(box);
-
-        });
-
+            }
+        );
     }
 
 
     // =================================================
-    // PRODUCT DROPDOWN
+    // UPDATE PRODUCT DROPDOWN
     // =================================================
 
     function updateProductDropdown() {
@@ -387,7 +496,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const firstOption =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
 
         firstOption.value = "";
@@ -396,27 +507,37 @@ document.addEventListener("DOMContentLoaded", function () {
             "Select Product";
 
 
-        saleProduct.appendChild(firstOption);
+        saleProduct.appendChild(
+            firstOption
+        );
 
 
-        products.forEach(product => {
+        products.forEach(
+            product => {
 
-            const option =
-                document.createElement("option");
-
-
-            option.value = product.id;
-
-            option.textContent = product.name;
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
 
-            saleProduct.appendChild(option);
+                option.value =
+                    product.id;
 
-        });
+
+                option.textContent =
+                    product.name;
+
+
+                saleProduct.appendChild(
+                    option
+                );
+
+            }
+        );
 
 
         updateSaleAmount();
-
     }
 
 
@@ -432,39 +553,45 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (name === "") {
 
-            alert("Please enter a customer name.");
+            alert(
+                "Please enter a customer name."
+            );
 
             customerName.focus();
 
             return;
-
         }
 
 
-        const exists =
+        const alreadyExists =
             customers.some(
                 customer =>
-                    customer.name.toLowerCase() ===
+                    String(
+                        customer.name
+                    ).toLowerCase() ===
                     name.toLowerCase()
             );
 
 
-        if (exists) {
+        if (alreadyExists) {
 
-            alert("This customer already exists.");
+            alert(
+                "This customer already exists."
+            );
 
             customerName.focus();
 
             return;
-
         }
 
 
         customers.push({
 
-            id: createId(),
+            id:
+                createId(),
 
-            name: name
+            name:
+                name
 
         });
 
@@ -479,8 +606,13 @@ document.addEventListener("DOMContentLoaded", function () {
         updateCustomerDropdown();
 
 
-        customerName.focus();
+        alert(
+            name +
+            " added successfully."
+        );
 
+
+        customerName.focus();
     }
 
 
@@ -499,83 +631,100 @@ document.addEventListener("DOMContentLoaded", function () {
                 "<p>No customers added yet.</p>";
 
             return;
-
         }
 
 
-        customers.forEach(customer => {
+        customers.forEach(
+            customer => {
 
-            const box =
-                document.createElement("div");
-
-
-            box.className = "customer-item";
-
-
-            const text =
-                document.createElement("p");
+                const box =
+                    document.createElement(
+                        "div"
+                    );
 
 
-            text.textContent =
-                customer.name;
+                box.className =
+                    "customer-item";
 
 
-            const deleteButton =
-                document.createElement("button");
+                const text =
+                    document.createElement(
+                        "p"
+                    );
 
 
-            deleteButton.type = "button";
+                text.textContent =
+                    customer.name;
 
-            deleteButton.textContent = "Delete";
+
+                const deleteButton =
+                    document.createElement(
+                        "button"
+                    );
 
 
-            deleteButton.addEventListener(
-                "click",
-                function () {
+                deleteButton.type =
+                    "button";
 
-                    if (
-                        !confirm(
-                            "Delete " +
-                            customer.name +
-                            "?"
-                        )
-                    ) {
 
-                        return;
+                deleteButton.textContent =
+                    "Delete";
+
+
+                deleteButton.addEventListener(
+                    "click",
+                    function () {
+
+                        const confirmed =
+                            confirm(
+                                "Delete " +
+                                customer.name +
+                                "?"
+                            );
+
+
+                        if (!confirmed) {
+                            return;
+                        }
+
+
+                        customers =
+                            customers.filter(
+                                item =>
+                                    item.id !==
+                                    customer.id
+                            );
+
+
+                        saveCustomers();
+
+
+                        displayCustomers();
+
+                        updateCustomerDropdown();
 
                     }
+                );
 
 
-                    customers =
-                        customers.filter(
-                            item =>
-                                item.id !== customer.id
-                        );
+                box.appendChild(text);
+
+                box.appendChild(
+                    deleteButton
+                );
 
 
-                    saveCustomers();
+                customerList.appendChild(
+                    box
+                );
 
-                    displayCustomers();
-
-                    updateCustomerDropdown();
-
-                }
-            );
-
-
-            box.appendChild(text);
-
-            box.appendChild(deleteButton);
-
-            customerList.appendChild(box);
-
-        });
-
+            }
+        );
     }
 
 
     // =================================================
-    // CUSTOMER DROPDOWN
+    // UPDATE CUSTOMER DROPDOWN
     // =================================================
 
     function updateCustomerDropdown() {
@@ -584,38 +733,51 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         const firstOption =
-            document.createElement("option");
+            document.createElement(
+                "option"
+            );
 
 
         firstOption.value = "";
+
 
         firstOption.textContent =
             "Walk-in / No Regular Customer";
 
 
-        saleCustomer.appendChild(firstOption);
+        saleCustomer.appendChild(
+            firstOption
+        );
 
 
-        customers.forEach(customer => {
+        customers.forEach(
+            customer => {
 
-            const option =
-                document.createElement("option");
-
-
-            option.value = customer.id;
-
-            option.textContent = customer.name;
+                const option =
+                    document.createElement(
+                        "option"
+                    );
 
 
-            saleCustomer.appendChild(option);
+                option.value =
+                    customer.id;
 
-        });
 
+                option.textContent =
+                    customer.name;
+
+
+                saleCustomer.appendChild(
+                    option
+                );
+
+            }
+        );
     }
 
 
     // =================================================
-    // UPDATE PRICE + SALE AMOUNT
+    // UPDATE PRICE AND SALE AMOUNT
     // =================================================
 
     function updateSaleAmount() {
@@ -623,7 +785,8 @@ document.addEventListener("DOMContentLoaded", function () {
         const product =
             products.find(
                 item =>
-                    item.id === saleProduct.value
+                    item.id ===
+                    saleProduct.value
             );
 
 
@@ -638,17 +801,24 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             return;
-
         }
+
+
+        const price =
+            Number(
+                product.price
+            );
 
 
         selectedPrice.textContent =
             "Price: ₹" +
-            Number(product.price).toFixed(2);
+            price.toFixed(2);
 
 
         const quantity =
-            Number(saleQuantity.value);
+            Number(
+                saleQuantity.value
+            );
 
 
         if (
@@ -660,19 +830,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 "Sale Amount: ₹0.00";
 
             return;
-
         }
 
 
         const amount =
-            Number(product.price) *
+            price *
             quantity;
 
 
         saleAmount.textContent =
             "Sale Amount: ₹" +
             amount.toFixed(2);
-
     }
 
 
@@ -685,31 +853,36 @@ document.addEventListener("DOMContentLoaded", function () {
         const product =
             products.find(
                 item =>
-                    item.id === saleProduct.value
+                    item.id ===
+                    saleProduct.value
             );
 
 
         const customer =
             customers.find(
                 item =>
-                    item.id === saleCustomer.value
+                    item.id ===
+                    saleCustomer.value
             );
 
 
         const quantity =
-            Number(saleQuantity.value);
+            Number(
+                saleQuantity.value
+            );
 
 
         // PRODUCT CHECK
 
         if (!product) {
 
-            alert("Please select a product.");
+            alert(
+                "Please select a product."
+            );
 
             saleProduct.focus();
 
             return;
-
         }
 
 
@@ -721,12 +894,13 @@ document.addEventListener("DOMContentLoaded", function () {
             quantity <= 0
         ) {
 
-            alert("Please enter a valid quantity.");
+            alert(
+                "Please enter a valid quantity."
+            );
 
             saleQuantity.focus();
 
             return;
-
         }
 
 
@@ -742,30 +916,45 @@ document.addEventListener("DOMContentLoaded", function () {
             getSalesDay(date);
 
 
+        const price =
+            Number(
+                product.price
+            );
+
+
         const amount =
-            Number(product.price) *
+            price *
             quantity;
 
 
         const newSale = {
 
-            id: createId(),
+            id:
+                createId(),
 
-            date: date,
+            date:
+                date,
 
-            day: day,
+            day:
+                day,
 
-            time: now.toISOString(),
+            time:
+                now.toISOString(),
 
-            productId: product.id,
+            productId:
+                product.id,
 
-            productName: product.name,
+            productName:
+                product.name,
 
-            price: Number(product.price),
+            price:
+                price,
 
-            quantity: quantity,
+            quantity:
+                quantity,
 
-            amount: amount,
+            amount:
+                amount,
 
             customerId:
                 customer
@@ -780,14 +969,15 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
 
-        // SAVE SALE
+        sales.push(
+            newSale
+        );
 
-        sales.push(newSale);
 
         saveSales();
 
 
-        // CLEAR INPUT
+        // CLEAR INPUTS
 
         saleProduct.value = "";
 
@@ -804,18 +994,15 @@ document.addEventListener("DOMContentLoaded", function () {
             "Sale Amount: ₹0.00";
 
 
-        // REFRESH EVERYTHING
+        // REFRESH
 
         displayAll();
-
-
-        saleProduct.focus();
 
     }
 
 
     // =================================================
-    // DAILY SALES
+    // DISPLAY DAILY SALES
     // =================================================
 
     function displayDailySales() {
@@ -829,243 +1016,60 @@ document.addEventListener("DOMContentLoaded", function () {
                 "<p>No sales recorded yet.</p>";
 
             return;
-
         }
 
 
         const days = {};
 
 
-        sales.forEach(sale => {
-
-            const day =
-                Number(sale.day);
-
-
-            if (!days[day]) {
-
-                days[day] = [];
-
-            }
-
-
-            days[day].push(sale);
-
-        });
-
-
-        Object.keys(days)
-            .map(Number)
-            .sort((a, b) => a - b)
-            .forEach(day => {
-
-                const box =
-                    document.createElement("div");
-
-
-                box.className =
-                    "real-time-day";
-
-
-                const heading =
-                    document.createElement("h3");
-
-
-                heading.textContent =
-                    "📅 Sales Day " + day;
-
-
-                box.appendChild(heading);
-
-
-                const productTotals = {};
-
-                let dayTotal = 0;
-
-                let totalQuantity = 0;
-
-
-                days[day].forEach(sale => {
-
-                    const quantity =
-                        Number(sale.quantity);
-
-
-                    const amount =
-                        Number(sale.amount);
-
-
-                    dayTotal += amount;
-
-                    totalQuantity += quantity;
-
-
-                    if (
-                        !productTotals[
-                            sale.productName
-                        ]
-                    ) {
-
-                        productTotals[
-                            sale.productName
-                        ] = {
-
-                            quantity: 0,
-
-                            amount: 0
-
-                        };
-
-                    }
-
-
-                    productTotals[
-                        sale.productName
-                    ].quantity += quantity;
-
-
-                    productTotals[
-                        sale.productName
-                    ].amount += amount;
-
-                });
-
-
-                // PRODUCTS SEPARATELY
-
-                Object.keys(productTotals)
-                    .forEach(product => {
-
-                        const data =
-                            productTotals[product];
-
-
-                        const row =
-                            document.createElement("p");
-
-
-                        row.textContent =
-                            "📦 " +
-                            product +
-                            " — " +
-                            data.quantity +
-                            " stocks = ₹" +
-                            data.amount.toFixed(2);
-
-
-                        box.appendChild(row);
-
-                    });
-
-
-                // DAILY GRAND TOTAL
-
-                const total =
-                    document.createElement("p");
-
-
-                total.innerHTML =
-                    "<strong>" +
-                    "Day " +
-                    day +
-                    " Grand Total: ₹" +
-                    dayTotal.toFixed(2) +
-                    "</strong>" +
-                    "<br>Total Stocks: " +
-                    totalQuantity;
-
-
-                box.appendChild(total);
-
-
-                dailySales.appendChild(box);
-
-            });
-
-    }
-
-
-    // =================================================
-    // CUSTOMER SALES
-    // =================================================
-
-    function displayCustomerSales() {
-
-        customerSales.innerHTML = "";
-
-
-        let found = false;
-
-
-        customers.forEach(customer => {
-
-            const records =
-                sales.filter(
-                    sale =>
-                        sale.customerId ===
-                        customer.id
-                );
-
-
-            if (records.length === 0) {
-
-                return;
-
-            }
-
-
-            found = true;
-
-
-            const box =
-                document.createElement("div");
-
-
-            box.className =
-                "customer-sales";
-
-
-            const heading =
-                document.createElement("h3");
-
-
-            heading.textContent =
-                "👤 " + customer.name;
-
-
-            box.appendChild(heading);
-
-
-            // GROUP CUSTOMER SALES BY DAY
-
-            const days = {};
-
-
-            records.forEach(sale => {
+        sales.forEach(
+            sale => {
 
                 const day =
-                    Number(sale.day);
+                    Number(
+                        sale.day
+                    );
+                        if (!days[day]) {
+            days[day] = [];
+        }
+
+        days[day].push(sale);
+    });
+
+    // Sort days from lowest to highest
+    const sortedDays = Object.keys(days)
+        .map(Number)
+        .sort((a, b) => a - b);
+
+    sortedDays.forEach(day => {
+        const daySales = days[day];
+
+        // Calculate total sales for this day
+        const dayTotal = daySales.reduce(
+            (total, sale) => total + Number(sale.total || 0),
+            0
+        );
+
+        // Calculate total quantity for this day
+        const dayQuantity = daySales.reduce(
+            (total, sale) => total + Number(sale.quantity || 0),
+            0
+        );
+
+        console.log(
+            `Day ${day}: ${dayQuantity} items, Total Sales: ₹${dayTotal.toFixed(2)}`
+        );
+    });
+
+    // Refresh everything on the page
+    if (typeof displayAll === "function") {
+        displayAll();
+    }
+
+});
 
 
-                if (!days[day]) {
-
-                    days[day] = [];
-
-                }
-
-
-                days[day].push(sale);
-
-            });
-
-
-            // CUSTOMER OVERALL TOTAL
-
-            let customerOverall = 0;
-
-
-            Object.keys(days)
-   
+  
 
 
    
