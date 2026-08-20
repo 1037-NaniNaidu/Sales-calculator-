@@ -1,189 +1,93 @@
 // =====================================================
-// EXISTING SALES CALCULATOR
+// SALES CALCULATOR + LIVE SALES TRACKER
 // =====================================================
 
-const costInput = document.getElementById("cost");
-const daysInput = document.getElementById("days");
-const startButton = document.getElementById("start");
-const dailySection = document.getElementById("dailySection");
-const dailyInputs = document.getElementById("dailyInputs");
-const calculateButton = document.getElementById("calculate");
-const result = document.getElementById("result");
-const clearButton = document.getElementById("clear");
+
+// =====================================================
+// GET HTML ELEMENTS
+// =====================================================
+
+const costInput =
+    document.getElementById("cost");
+
+const daysInput =
+    document.getElementById("days");
+
+const startButton =
+    document.getElementById("start");
+
+const dailySection =
+    document.getElementById("dailySection");
+
+const dailyInputs =
+    document.getElementById("dailyInputs");
+
+const calculateButton =
+    document.getElementById("calculate");
+
+const result =
+    document.getElementById("result");
+
+const clearButton =
+    document.getElementById("clear");
+
+const realTimeQuantity =
+    document.getElementById("realTimeQuantity");
+
+const addRealTimeButton =
+    document.getElementById("addRealTimeSale");
+
+const clearRealTimeButton =
+    document.getElementById("clearRealTimeSales");
+
+const realTimeDay =
+    document.getElementById("realTimeDay");
+
+const realTimeTotal =
+    document.getElementById("realTimeTotal");
+
+const realTimeHistory =
+    document.getElementById("realTimeHistory");
+
+
+// =====================================================
+// VARIABLES
+// =====================================================
 
 let stockInputs = [];
 
 
 // =====================================================
-// START DAILY CALCULATOR
+// LOAD SAVED COST
 // =====================================================
 
-startButton.addEventListener("click", () => {
+const savedCost =
+    localStorage.getItem("salesCost");
 
-    const days = Number(daysInput.value);
+if (savedCost !== null) {
+    costInput.value = savedCost;
+}
 
-    if (!Number.isInteger(days) || days < 1 || days > 366) {
-        alert("Enter a whole number of days from 1 to 366.");
-        return;
-    }
 
-    dailyInputs.innerHTML = "";
-    stockInputs = [];
+// =====================================================
+// SAVE COST WHEN IT CHANGES
+// =====================================================
 
-    for (let i = 1; i <= days; i++) {
+costInput.addEventListener("input", () => {
 
-        const box = document.createElement("div");
-        box.className = "day";
+    localStorage.setItem(
+        "salesCost",
+        costInput.value
+    );
 
-        const title = document.createElement("div");
-        title.className = "day-title";
-        title.textContent = "Day " + i;
-
-        const input = document.createElement("input");
-
-        input.type = "number";
-        input.min = "0";
-        input.step = "1";
-        input.placeholder = "Number of stocks sold";
-
-        const dailyTotal = document.createElement("div");
-
-        dailyTotal.className = "daily-total";
-        dailyTotal.textContent = "Daily sale: ₹0.00";
-
-        input.addEventListener("input", () => {
-
-            const cost = Number(costInput.value) || 0;
-            const stocks = Number(input.value) || 0;
-
-            dailyTotal.textContent =
-                "Daily sale: ₹" +
-                (stocks * cost).toFixed(2);
-        });
-
-        box.append(
-            title,
-            input,
-            dailyTotal
-        );
-
-        dailyInputs.appendChild(box);
-        stockInputs.push(input);
-    }
-
-    dailySection.classList.remove("hidden");
-    result.classList.add("hidden");
-
-    dailySection.scrollIntoView({
-        behavior: "smooth"
-    });
+    updateAllSalesDisplays();
 
 });
 
 
 // =====================================================
-// CALCULATE EXISTING SALES
+// LOAD LIVE SALES
 // =====================================================
-
-calculateButton.addEventListener("click", () => {
-
-    const cost = Number(costInput.value);
-
-    if (!Number.isFinite(cost) || cost < 0) {
-
-        alert("Enter a valid cost per stock.");
-        return;
-    }
-
-    let totalStocks = 0;
-    let totalSales = 0;
-    let rows = "";
-
-    for (let i = 0; i < stockInputs.length; i++) {
-
-        const value = stockInputs[i].value.trim();
-
-        if (value === "" || Number(value) < 0) {
-
-            alert(
-                "Enter stocks sold for Day " +
-                (i + 1) +
-                "."
-            );
-
-            stockInputs[i].focus();
-            return;
-        }
-
-        const stocks = Number(value);
-        const sale = stocks * cost;
-
-        totalStocks += stocks;
-        totalSales += sale;
-
-        rows += `
-            <div class="summary-row">
-                Day ${i + 1}: ${stocks} stocks = ₹${sale.toFixed(2)}
-            </div>
-        `;
-    }
-
-    result.innerHTML = `
-        <h2>Sales Summary</h2>
-
-        ${rows}
-
-        <hr>
-
-        <div class="summary-row">
-            <b>Total Stock Sold:</b>
-            ${totalStocks}
-        </div>
-
-        <div class="summary-row total">
-            Total Sales: ₹${totalSales.toFixed(2)}
-        </div>
-    `;
-
-    result.classList.remove("hidden");
-
-    result.scrollIntoView({
-        behavior: "smooth"
-    });
-
-});
-
-
-// =====================================================
-// EXISTING CLEAR BUTTON
-// =====================================================
-
-clearButton.addEventListener("click", () => {
-
-    costInput.value = "";
-    daysInput.value = "";
-
-    dailyInputs.innerHTML = "";
-    stockInputs = [];
-
-    dailySection.classList.add("hidden");
-
-    result.classList.add("hidden");
-    result.innerHTML = "";
-
-    window.scrollTo({
-        top: 0,
-        behavior: "smooth"
-    });
-
-});
-
-
-// =====================================================
-// REAL-TIME SALES TRACKER
-// =====================================================
-
-// Load saved sales from browser storage
 
 let realTimeSales = [];
 
@@ -202,7 +106,64 @@ try {
 
 
 // =====================================================
-// GET CURRENT CALENDAR SALES DAY
+// GET SALES DATE
+// =====================================================
+
+function getDateOnly(date) {
+
+    return new Date(
+        date.getFullYear(),
+        date.getMonth(),
+        date.getDate()
+    );
+
+}
+
+
+// =====================================================
+// GET SALES DAY
+// =====================================================
+
+function getSalesDayForSale(sale) {
+
+    if (!realTimeSales.length) {
+        return 1;
+    }
+
+
+    const firstSale =
+        new Date(realTimeSales[0].time);
+
+
+    const saleDate =
+        getDateOnly(
+            new Date(sale.time)
+        );
+
+
+    const firstDate =
+        getDateOnly(firstSale);
+
+
+    const difference =
+        saleDate - firstDate;
+
+
+    const oneDay =
+        24 * 60 * 60 * 1000;
+
+
+    return (
+        Math.floor(
+            difference / oneDay
+        ) + 1
+    );
+
+}
+
+
+// =====================================================
+// GET CURRENT SALES DAY
 // =====================================================
 
 function getCurrentSalesDay() {
@@ -211,59 +172,70 @@ function getCurrentSalesDay() {
         return 1;
     }
 
-    // Find the date of the first recorded sale
 
-    const firstSaleDate =
+    const firstSale =
         new Date(realTimeSales[0].time);
 
-    const today =
-        new Date();
 
-    // Remove the time and keep only the date
+    const today =
+        getDateOnly(
+            new Date()
+        );
+
 
     const firstDate =
-        new Date(
-            firstSaleDate.getFullYear(),
-            firstSaleDate.getMonth(),
-            firstSaleDate.getDate()
-        );
+        getDateOnly(firstSale);
 
-    const currentDate =
-        new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate()
-        );
 
     const difference =
-        currentDate - firstDate;
+        today - firstDate;
+
 
     const oneDay =
         24 * 60 * 60 * 1000;
 
+
     return (
-        Math.floor(difference / oneDay) + 1
+        Math.floor(
+            difference / oneDay
+        ) + 1
     );
+
 }
 
 
 // =====================================================
-// ADD REAL-TIME SALE
+// GET COST
+// =====================================================
+
+function getCost() {
+
+    const cost =
+        Number(costInput.value);
+
+    if (
+        !Number.isFinite(cost) ||
+        cost < 0
+    ) {
+        return 0;
+    }
+
+    return cost;
+
+}
+
+
+// =====================================================
+// ADD LIVE SALE
 // =====================================================
 
 function addRealTimeSale() {
 
-    const input =
-        document.getElementById(
-            "realTimeQuantity"
+    const quantity =
+        Number(
+            realTimeQuantity.value
         );
 
-    if (!input) {
-        return;
-    }
-
-    const quantity =
-        Number(input.value);
 
     if (
         !Number.isInteger(quantity) ||
@@ -274,6 +246,8 @@ function addRealTimeSale() {
             "Enter a valid quantity sold."
         );
 
+        realTimeQuantity.focus();
+
         return;
     }
 
@@ -283,20 +257,17 @@ function addRealTimeSale() {
         quantity: quantity,
 
         time:
-            new Date().toISOString(),
-
-        day:
-            getCurrentSalesDay()
+            new Date().toISOString()
 
     };
 
 
-    // Add sale
+    // Add sale to the array
 
     realTimeSales.push(sale);
 
 
-    // Save sale permanently
+    // Save to browser
 
     localStorage.setItem(
         "realTimeSales",
@@ -306,44 +277,29 @@ function addRealTimeSale() {
 
     // Clear input
 
-    input.value = "";
+    realTimeQuantity.value = "";
 
 
-    // Update tracker
+    // Update everything
 
-    displayRealTimeSales();
+    updateAllSalesDisplays();
+
+
+    realTimeQuantity.focus();
 
 }
 
 
 // =====================================================
-// DISPLAY REAL-TIME SALES
+// DISPLAY LIVE SALES
 // =====================================================
 
 function displayRealTimeSales() {
 
-    const history =
-        document.getElementById(
-            "realTimeHistory"
-        );
-
-    const dayDisplay =
-        document.getElementById(
-            "realTimeDay"
-        );
-
-    const totalDisplay =
-        document.getElementById(
-            "realTimeTotal"
-        );
-
-
-    // Stop if tracker elements don't exist
-
     if (
-        !history ||
-        !dayDisplay ||
-        !totalDisplay
+        !realTimeHistory ||
+        !realTimeDay ||
+        !realTimeTotal
     ) {
         return;
     }
@@ -353,25 +309,29 @@ function displayRealTimeSales() {
         getCurrentSalesDay();
 
 
-    // Show current sales day
+    // Current day heading
 
-    dayDisplay.textContent =
+    realTimeDay.textContent =
         "Sales Day " + currentDay;
 
 
-    // Calculate today's total
+    // Current day total
 
-    let todayTotal = 0;
+    let todayQuantity = 0;
 
 
     realTimeSales.forEach(
-        (sale) => {
+        sale => {
+
+            const day =
+                getSalesDayForSale(sale);
+
 
             if (
-                sale.day === currentDay
+                day === currentDay
             ) {
 
-                todayTotal +=
+                todayQuantity +=
                     Number(sale.quantity);
 
             }
@@ -380,23 +340,32 @@ function displayRealTimeSales() {
     );
 
 
-    totalDisplay.textContent =
-        "Today's Total: " +
-        todayTotal;
+    const cost =
+        getCost();
 
 
-    // Clear old history display
+    const todayAmount =
+        todayQuantity * cost;
 
-    history.innerHTML = "";
+
+    realTimeTotal.textContent =
+        todayQuantity +
+        " stocks = ₹" +
+        todayAmount.toFixed(2);
 
 
-    // No sales yet
+    // Clear history
+
+    realTimeHistory.innerHTML = "";
+
+
+    // No sales
 
     if (
         realTimeSales.length === 0
     ) {
 
-        history.innerHTML =
+        realTimeHistory.innerHTML =
             "<p>No sales recorded yet.</p>";
 
         return;
@@ -405,15 +374,26 @@ function displayRealTimeSales() {
 
     // Find highest sales day
 
-    const highestDay =
-        Math.max(
-            ...realTimeSales.map(
-                sale => Number(sale.day)
-            )
-        );
+    let highestDay = 1;
 
 
-    // Display each sales day
+    realTimeSales.forEach(
+        sale => {
+
+            const day =
+                getSalesDayForSale(sale);
+
+            if (
+                day > highestDay
+            ) {
+                highestDay = day;
+            }
+
+        }
+    );
+
+
+    // Display every day separately
 
     for (
         let day = 1;
@@ -424,7 +404,8 @@ function displayRealTimeSales() {
         const daySales =
             realTimeSales.filter(
                 sale =>
-                    Number(sale.day) === day
+                    getSalesDayForSale(sale)
+                    === day
             );
 
 
@@ -435,12 +416,20 @@ function displayRealTimeSales() {
         }
 
 
+        // -----------------------------------------
+        // DAY BOX
+        // -----------------------------------------
+
         const dayBox =
             document.createElement("div");
 
         dayBox.className =
             "real-time-day";
 
+
+        // -----------------------------------------
+        // DAY TITLE
+        // -----------------------------------------
 
         const heading =
             document.createElement("h3");
@@ -454,30 +443,72 @@ function displayRealTimeSales() {
         );
 
 
-        let total = 0;
+        // -----------------------------------------
+        // DAY QUANTITY
+        // -----------------------------------------
+
+        let dayQuantity = 0;
 
 
         daySales.forEach(
-            (sale) => {
+            sale => {
 
-                const quantity =
+                dayQuantity +=
                     Number(sale.quantity);
 
-                total += quantity;
+            }
+        );
 
+
+        // -----------------------------------------
+        // DAY AMOUNT
+        // -----------------------------------------
+
+        const dayAmount =
+            dayQuantity * cost;
+
+
+        // -----------------------------------------
+        // DAY TOTAL DISPLAY
+        // -----------------------------------------
+
+        const dayTotal =
+            document.createElement("p");
+
+
+        dayTotal.innerHTML =
+            "<strong>" +
+            dayQuantity +
+            " stocks</strong> = ₹" +
+            dayAmount.toFixed(2);
+
+
+        dayBox.appendChild(
+            dayTotal
+        );
+
+
+        // -----------------------------------------
+        // INDIVIDUAL SALES
+        // -----------------------------------------
+
+        daySales.forEach(
+            sale => {
 
                 const entry =
                     document.createElement("p");
 
 
                 const time =
-                    new Date(sale.time);
+                    new Date(
+                        sale.time
+                    );
 
 
                 entry.textContent =
-                    time.toLocaleString() +
+                    time.toLocaleTimeString() +
                     " → " +
-                    quantity +
+                    sale.quantity +
                     " stocks";
 
 
@@ -489,21 +520,9 @@ function displayRealTimeSales() {
         );
 
 
-        const totalText =
-            document.createElement("strong");
+        // Add day to history
 
-
-        totalText.textContent =
-            "Total Sold: " +
-            total;
-
-
-        dayBox.appendChild(
-            totalText
-        );
-
-
-        history.appendChild(
+        realTimeHistory.appendChild(
             dayBox
         );
 
@@ -513,44 +532,440 @@ function displayRealTimeSales() {
 
 
 // =====================================================
-// CLEAR REAL-TIME SALES
+// START OLD DAILY CALCULATOR
 // =====================================================
 
-function clearRealTimeSales() {
+startButton.addEventListener(
+    "click",
+    () => {
 
-    const confirmation =
-        confirm(
-            "Are you sure you want to delete all saved sales?"
+        const days =
+            Number(
+                daysInput.value
+            );
+
+
+        if (
+            !Number.isInteger(days) ||
+            days < 1 ||
+            days > 366
+        ) {
+
+            alert(
+                "Enter a whole number of days from 1 to 366."
+            );
+
+            return;
+        }
+
+
+        dailyInputs.innerHTML = "";
+
+        stockInputs = [];
+
+
+        // -----------------------------------------
+        // CREATE DAILY ROWS
+        // -----------------------------------------
+
+        for (
+            let i = 1;
+            i <= days;
+            i++
+        ) {
+
+            const box =
+                document.createElement("div");
+
+            box.className =
+                "day";
+
+
+            const title =
+                document.createElement("div");
+
+            title.className =
+                "day-title";
+
+            title.textContent =
+                "Day " + i;
+
+
+            const input =
+                document.createElement("input");
+
+            input.type =
+                "number";
+
+            input.min =
+                "0";
+
+            input.step =
+                "1";
+
+            input.placeholder =
+                "Number of stocks sold";
+
+
+            const dailyTotal =
+                document.createElement("div");
+
+            dailyTotal.className =
+                "daily-total";
+
+            dailyTotal.textContent =
+                "Daily sale: ₹0.00";
+
+
+            // -----------------------------------------
+            // UPDATE DAILY AMOUNT
+            // -----------------------------------------
+
+            input.addEventListener(
+                "input",
+                () => {
+
+                    const stocks =
+                        Number(
+                            input.value
+                        ) || 0;
+
+
+                    const cost =
+                        getCost();
+
+
+                    dailyTotal.textContent =
+                        "Daily sale: ₹" +
+                        (
+                            stocks * cost
+                        ).toFixed(2);
+
+                }
+            );
+
+
+            box.append(
+                title,
+                input,
+                dailyTotal
+            );
+
+
+            dailyInputs.appendChild(
+                box
+            );
+
+
+            stockInputs.push(
+                input
+            );
+
+        }
+
+
+        dailySection.classList.remove(
+            "hidden"
         );
 
 
-    if (!confirmation) {
+        result.classList.add(
+            "hidden"
+        );
+
+
+        dailySection.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+// =====================================================
+// CALCULATE MANUAL DAILY SALES
+// =====================================================
+
+calculateButton.addEventListener(
+    "click",
+    () => {
+
+        const cost =
+            Number(
+                costInput.value
+            );
+
+
+        if (
+            !Number.isFinite(cost) ||
+            cost < 0
+        ) {
+
+            alert(
+                "Enter a valid cost per stock."
+            );
+
+            return;
+        }
+
+
+        let totalStocks = 0;
+
+        let totalSales = 0;
+
+        let rows = "";
+
+
+        for (
+            let i = 0;
+            i < stockInputs.length;
+            i++
+        ) {
+
+            const value =
+                stockInputs[i].value.trim();
+
+
+            if (
+                value === "" ||
+                Number(value) < 0
+            ) {
+
+                alert(
+                    "Enter stocks sold for Day " +
+                    (i + 1) +
+                    "."
+                );
+
+                stockInputs[i].focus();
+
+                return;
+            }
+
+
+            const stocks =
+                Number(value);
+
+
+            const sale =
+                stocks * cost;
+
+
+            totalStocks +=
+                stocks;
+
+
+            totalSales +=
+                sale;
+
+
+            rows += `
+                <div class="summary-row">
+                    Day ${i + 1}:
+                    ${stocks} stocks =
+                    ₹${sale.toFixed(2)}
+                </div>
+            `;
+
+        }
+
+
+        result.innerHTML = `
+
+            <h2>Calculator Summary</h2>
+
+            ${rows}
+
+            <hr>
+
+            <div class="summary-row">
+                <b>Total Stock Sold:</b>
+                ${totalStocks}
+            </div>
+
+            <div class="summary-row total">
+                Total Sales:
+                ₹${totalSales.toFixed(2)}
+            </div>
+
+        `;
+
+
+        result.classList.remove(
+            "hidden"
+        );
+
+
+        result.scrollIntoView({
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+// =====================================================
+// GRAND TOTAL OF LIVE SALES
+// =====================================================
+
+function displayGrandTotal() {
+
+    if (!realTimeHistory) {
         return;
     }
 
 
-    realTimeSales = [];
+    let totalQuantity = 0;
 
 
-    localStorage.removeItem(
-        "realTimeSales"
+    realTimeSales.forEach(
+        sale => {
+
+            totalQuantity +=
+                Number(sale.quantity);
+
+        }
     );
 
 
-    displayRealTimeSales();
+    const cost =
+        getCost();
+
+
+    const totalAmount =
+        totalQuantity * cost;
+
+
+    const grandTotal =
+        document.createElement("div");
+
+
+    grandTotal.className =
+        "grand-total";
+
+
+    grandTotal.innerHTML = `
+
+        <hr>
+
+        <h2>Grand Total</h2>
+
+        <p>
+            <strong>
+                ${totalQuantity} stocks
+            </strong>
+        </p>
+
+        <p>
+            Total Sales:
+            <strong>
+                ₹${totalAmount.toFixed(2)}
+            </strong>
+        </p>
+
+    `;
+
+
+    realTimeHistory.appendChild(
+        grandTotal
+    );
 
 }
 
 
 // =====================================================
-// CONNECT REAL-TIME BUTTONS
+// UPDATE EVERYTHING
 // =====================================================
 
-const addRealTimeButton =
-    document.getElementById(
-        "addRealTimeSale"
-    );
+function updateAllSalesDisplays() {
 
+    displayRealTimeSales();
+
+    displayGrandTotal();
+
+}
+
+
+// =====================================================
+// CLEAR CALCULATOR
+// =====================================================
+
+clearButton.addEventListener(
+    "click",
+    () => {
+
+        costInput.value = "";
+
+        daysInput.value = "";
+
+        localStorage.removeItem(
+            "salesCost"
+        );
+
+
+        dailyInputs.innerHTML = "";
+
+        stockInputs = [];
+
+
+        dailySection.classList.add(
+            "hidden"
+        );
+
+
+        result.classList.add(
+            "hidden"
+        );
+
+
+        result.innerHTML = "";
+
+
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+
+    }
+);
+
+
+// =====================================================
+// CLEAR LIVE SALES
+// =====================================================
+
+clearRealTimeButton.addEventListener(
+    "click",
+    () => {
+
+        const confirmation =
+            confirm(
+                "Are you sure you want to delete all saved sales?"
+            );
+
+
+        if (!confirmation) {
+            return;
+        }
+
+
+        realTimeSales = [];
+
+
+        localStorage.removeItem(
+            "realTimeSales"
+        );
+
+
+        updateAllSalesDisplays();
+
+    }
+);
+
+
+// =====================================================
+// BUTTON CONNECTIONS
+// =====================================================
 
 if (addRealTimeButton) {
 
@@ -562,34 +977,18 @@ if (addRealTimeButton) {
 }
 
 
-const clearRealTimeButton =
-    document.getElementById(
-        "clearRealTimeSales"
-    );
+// =====================================================
+// LOAD DATA WHEN WEBSITE OPENS
+// =====================================================
 
-
-if (clearRealTimeButton) {
-
-    clearRealTimeButton.addEventListener(
-        "click",
-        clearRealTimeSales
-    );
-
-}
+updateAllSalesDisplays();
 
 
 // =====================================================
-// LOAD SAVED SALES WHEN WEBSITE OPENS
-// =====================================================
-
-displayRealTimeSales();
-
-
-// =====================================================
-// UPDATE SALES DAY AUTOMATICALLY
+// UPDATE AUTOMATICALLY EVERY MINUTE
 // =====================================================
 
 setInterval(
-    displayRealTimeSales,
+    updateAllSalesDisplays,
     60000
 );
