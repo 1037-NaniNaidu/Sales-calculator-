@@ -20,76 +20,63 @@ let stockInputs = [];
 
 startButton.addEventListener("click", () => {
 
-  const days = Number(daysInput.value);
+    const days = Number(daysInput.value);
 
-  if (!Number.isInteger(days) || days < 1 || days > 366) {
-    alert("Enter a whole number of days from 1 to 366.");
-    return;
-  }
+    if (!Number.isInteger(days) || days < 1 || days > 366) {
+        alert("Enter a whole number of days from 1 to 366.");
+        return;
+    }
 
-  dailyInputs.innerHTML = "";
-  stockInputs = [];
+    dailyInputs.innerHTML = "";
+    stockInputs = [];
 
+    for (let i = 1; i <= days; i++) {
 
-  for (let i = 1; i <= days; i++) {
+        const box = document.createElement("div");
+        box.className = "day";
 
-    const box = document.createElement("div");
-    box.className = "day";
+        const title = document.createElement("div");
+        title.className = "day-title";
+        title.textContent = "Day " + i;
 
+        const input = document.createElement("input");
 
-    const title = document.createElement("div");
-    title.className = "day-title";
-    title.textContent = "Day " + i;
+        input.type = "number";
+        input.min = "0";
+        input.step = "1";
+        input.placeholder = "Number of stocks sold";
 
+        const dailyTotal = document.createElement("div");
 
-    const input = document.createElement("input");
+        dailyTotal.className = "daily-total";
+        dailyTotal.textContent = "Daily sale: ₹0.00";
 
-    input.type = "number";
-    input.min = "0";
-    input.step = "1";
-    input.placeholder = "Number of stocks sold";
+        input.addEventListener("input", () => {
 
+            const cost = Number(costInput.value) || 0;
+            const stocks = Number(input.value) || 0;
 
-    const dailyTotal = document.createElement("div");
+            dailyTotal.textContent =
+                "Daily sale: ₹" +
+                (stocks * cost).toFixed(2);
+        });
 
-    dailyTotal.className = "daily-total";
-    dailyTotal.textContent = "Daily sale: ₹0.00";
+        box.append(
+            title,
+            input,
+            dailyTotal
+        );
 
+        dailyInputs.appendChild(box);
+        stockInputs.push(input);
+    }
 
-    input.addEventListener("input", () => {
+    dailySection.classList.remove("hidden");
+    result.classList.add("hidden");
 
-      const cost =
-        Number(costInput.value) || 0;
-
-      const stocks =
-        Number(input.value) || 0;
-
-      dailyTotal.textContent =
-        "Daily sale: ₹" +
-        (stocks * cost).toFixed(2);
-
+    dailySection.scrollIntoView({
+        behavior: "smooth"
     });
-
-
-    box.append(
-      title,
-      input,
-      dailyTotal
-    );
-
-    dailyInputs.appendChild(box);
-
-    stockInputs.push(input);
-  }
-
-
-  dailySection.classList.remove("hidden");
-
-  result.classList.add("hidden");
-
-  dailySection.scrollIntoView({
-    behavior: "smooth"
-  });
 
 });
 
@@ -100,98 +87,69 @@ startButton.addEventListener("click", () => {
 
 calculateButton.addEventListener("click", () => {
 
-  const cost =
-    Number(costInput.value);
+    const cost = Number(costInput.value);
 
+    if (!Number.isFinite(cost) || cost < 0) {
 
-  if (!Number.isFinite(cost) || cost < 0) {
-
-    alert(
-      "Enter a valid cost per stock."
-    );
-
-    return;
-  }
-
-
-  let totalStocks = 0;
-
-  let totalSales = 0;
-
-  let rows = "";
-
-
-  for (
-    let i = 0;
-    i < stockInputs.length;
-    i++
-  ) {
-
-    const value =
-      stockInputs[i].value.trim();
-
-
-    if (
-      value === "" ||
-      Number(value) < 0
-    ) {
-
-      alert(
-        "Enter stocks sold for Day " +
-        (i + 1) +
-        "."
-      );
-
-      stockInputs[i].focus();
-
-      return;
+        alert("Enter a valid cost per stock.");
+        return;
     }
 
+    let totalStocks = 0;
+    let totalSales = 0;
+    let rows = "";
 
-    const stocks =
-      Number(value);
+    for (let i = 0; i < stockInputs.length; i++) {
 
-    const sale =
-      stocks * cost;
+        const value = stockInputs[i].value.trim();
 
+        if (value === "" || Number(value) < 0) {
 
-    totalStocks += stocks;
+            alert(
+                "Enter stocks sold for Day " +
+                (i + 1) +
+                "."
+            );
 
-    totalSales += sale;
+            stockInputs[i].focus();
+            return;
+        }
 
+        const stocks = Number(value);
+        const sale = stocks * cost;
 
-    rows += `
-      <div class="summary-row">
-        Day ${i + 1}: ${stocks} stocks = ₹${sale.toFixed(2)}
-      </div>
+        totalStocks += stocks;
+        totalSales += sale;
+
+        rows += `
+            <div class="summary-row">
+                Day ${i + 1}: ${stocks} stocks = ₹${sale.toFixed(2)}
+            </div>
+        `;
+    }
+
+    result.innerHTML = `
+        <h2>Sales Summary</h2>
+
+        ${rows}
+
+        <hr>
+
+        <div class="summary-row">
+            <b>Total Stock Sold:</b>
+            ${totalStocks}
+        </div>
+
+        <div class="summary-row total">
+            Total Sales: ₹${totalSales.toFixed(2)}
+        </div>
     `;
-  }
 
+    result.classList.remove("hidden");
 
-  result.innerHTML = `
-    <h2>Sales Summary</h2>
-
-    ${rows}
-
-    <hr>
-
-    <div class="summary-row">
-      <b>Total Stock Sold:</b>
-      ${totalStocks}
-    </div>
-
-    <div class="summary-row total">
-      Total Sales: ₹${totalSales.toFixed(2)}
-    </div>
-  `;
-
-
-  result.classList.remove("hidden");
-
-
-  result.scrollIntoView({
-    behavior: "smooth"
-  });
+    result.scrollIntoView({
+        behavior: "smooth"
+    });
 
 });
 
@@ -202,25 +160,21 @@ calculateButton.addEventListener("click", () => {
 
 clearButton.addEventListener("click", () => {
 
-  costInput.value = "";
+    costInput.value = "";
+    daysInput.value = "";
 
-  daysInput.value = "";
+    dailyInputs.innerHTML = "";
+    stockInputs = [];
 
-  dailyInputs.innerHTML = "";
+    dailySection.classList.add("hidden");
 
-  stockInputs = [];
+    result.classList.add("hidden");
+    result.innerHTML = "";
 
-  dailySection.classList.add("hidden");
-
-  result.classList.add("hidden");
-
-  result.innerHTML = "";
-
-
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth"
-  });
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
 
 });
 
@@ -229,318 +183,331 @@ clearButton.addEventListener("click", () => {
 // REAL-TIME SALES TRACKER
 // =====================================================
 
-// Load previously saved sales
+// Load saved sales from browser storage
 
-let realTimeSales =
-  JSON.parse(
-    localStorage.getItem("realTimeSales")
-  ) || [];
+let realTimeSales = [];
 
+try {
 
-// Load the tracking start time
+    realTimeSales =
+        JSON.parse(
+            localStorage.getItem("realTimeSales")
+        ) || [];
 
-let trackingStart =
-  localStorage.getItem(
-    "trackingStart"
-  );
+} catch (error) {
 
+    realTimeSales = [];
 
-// Start tracking for the first time
-
-if (!trackingStart) {
-
-  trackingStart =
-    new Date().toISOString();
-
-  localStorage.setItem(
-    "trackingStart",
-    trackingStart
-  );
 }
 
 
 // =====================================================
-// FIND CURRENT 24-HOUR SALES DAY
+// GET CURRENT CALENDAR SALES DAY
 // =====================================================
 
 function getCurrentSalesDay() {
 
-  const start =
-    new Date(trackingStart);
+    if (realTimeSales.length === 0) {
+        return 1;
+    }
 
-  const now =
-    new Date();
+    // Find the date of the first recorded sale
 
+    const firstSaleDate =
+        new Date(realTimeSales[0].time);
 
-  const difference =
-    now - start;
+    const today =
+        new Date();
 
+    // Remove the time and keep only the date
 
-  const oneDay =
-    24 * 60 * 60 * 1000;
+    const firstDate =
+        new Date(
+            firstSaleDate.getFullYear(),
+            firstSaleDate.getMonth(),
+            firstSaleDate.getDate()
+        );
 
+    const currentDate =
+        new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate()
+        );
 
-  return (
-    Math.floor(
-      difference / oneDay
-    ) + 1
-  );
+    const difference =
+        currentDate - firstDate;
+
+    const oneDay =
+        24 * 60 * 60 * 1000;
+
+    return (
+        Math.floor(difference / oneDay) + 1
+    );
 }
 
 
 // =====================================================
-// ADD A REAL-TIME SALE
+// ADD REAL-TIME SALE
 // =====================================================
 
 function addRealTimeSale() {
 
-  const input =
-    document.getElementById(
-      "realTimeQuantity"
+    const input =
+        document.getElementById(
+            "realTimeQuantity"
+        );
+
+    if (!input) {
+        return;
+    }
+
+    const quantity =
+        Number(input.value);
+
+    if (
+        !Number.isInteger(quantity) ||
+        quantity <= 0
+    ) {
+
+        alert(
+            "Enter a valid quantity sold."
+        );
+
+        return;
+    }
+
+
+    const sale = {
+
+        quantity: quantity,
+
+        time:
+            new Date().toISOString(),
+
+        day:
+            getCurrentSalesDay()
+
+    };
+
+
+    // Add sale
+
+    realTimeSales.push(sale);
+
+
+    // Save sale permanently
+
+    localStorage.setItem(
+        "realTimeSales",
+        JSON.stringify(realTimeSales)
     );
 
 
-  const quantity =
-    Number(input.value);
+    // Clear input
+
+    input.value = "";
 
 
-  if (
-    !Number.isInteger(quantity) ||
-    quantity <= 0
-  ) {
+    // Update tracker
 
-    alert(
-      "Enter a valid quantity sold."
-    );
-
-    return;
-  }
-
-
-  const sale = {
-
-    quantity: quantity,
-
-    time:
-      new Date().toISOString(),
-
-    day:
-      getCurrentSalesDay()
-
-  };
-
-
-  // Add sale to saved data
-
-  realTimeSales.push(sale);
-
-
-  // Save permanently in browser
-
-  localStorage.setItem(
-    "realTimeSales",
-    JSON.stringify(realTimeSales)
-  );
-
-
-  // Clear input
-
-  input.value = "";
-
-
-  // Update screen
-
-  displayRealTimeSales();
+    displayRealTimeSales();
 
 }
 
 
 // =====================================================
-// DISPLAY SALES
+// DISPLAY REAL-TIME SALES
 // =====================================================
 
 function displayRealTimeSales() {
 
-  const history =
-    document.getElementById(
-      "realTimeHistory"
-    );
+    const history =
+        document.getElementById(
+            "realTimeHistory"
+        );
+
+    const dayDisplay =
+        document.getElementById(
+            "realTimeDay"
+        );
+
+    const totalDisplay =
+        document.getElementById(
+            "realTimeTotal"
+        );
 
 
-  const dayDisplay =
-    document.getElementById(
-      "realTimeDay"
-    );
-
-
-  const totalDisplay =
-    document.getElementById(
-      "realTimeTotal"
-    );
-
-
-  if (!history) {
-    return;
-  }
-
-
-  const currentDay =
-    getCurrentSalesDay();
-
-
-  // Show current day
-
-  dayDisplay.textContent =
-    "Sales Day " +
-    currentDay;
-
-
-  // Calculate current day total
-
-  let todayTotal = 0;
-
-
-  realTimeSales.forEach(
-    function(sale) {
-
-      if (
-        sale.day === currentDay
-      ) {
-
-        todayTotal +=
-          Number(sale.quantity);
-
-      }
-
-    }
-  );
-
-
-  totalDisplay.textContent =
-    "Today's Total: " +
-    todayTotal;
-
-
-  // Clear history display
-
-  history.innerHTML = "";
-
-
-  if (
-    realTimeSales.length === 0
-  ) {
-
-    history.innerHTML =
-      "<p>No sales recorded yet.</p>";
-
-    return;
-  }
-
-
-  // Find highest day
-
-  const highestDay =
-    Math.max(
-      ...realTimeSales.map(
-        sale => sale.day
-      )
-    );
-
-
-  // Create each sales day
-
-  for (
-    let day = 1;
-    day <= highestDay;
-    day++
-  ) {
-
-    const daySales =
-      realTimeSales.filter(
-        sale => sale.day === day
-      );
-
+    // Stop if tracker elements don't exist
 
     if (
-      daySales.length === 0
+        !history ||
+        !dayDisplay ||
+        !totalDisplay
     ) {
-      continue;
+        return;
     }
 
 
-    const dayBox =
-      document.createElement("div");
-
-    dayBox.className =
-      "real-time-day";
+    const currentDay =
+        getCurrentSalesDay();
 
 
-    const heading =
-      document.createElement("h3");
+    // Show current sales day
 
-    heading.textContent =
-      "Sales Day " + day;
+    dayDisplay.textContent =
+        "Sales Day " + currentDay;
 
 
-    dayBox.appendChild(
-      heading
+    // Calculate today's total
+
+    let todayTotal = 0;
+
+
+    realTimeSales.forEach(
+        (sale) => {
+
+            if (
+                sale.day === currentDay
+            ) {
+
+                todayTotal +=
+                    Number(sale.quantity);
+
+            }
+
+        }
     );
 
 
-    let total = 0;
+    totalDisplay.textContent =
+        "Today's Total: " +
+        todayTotal;
 
 
-    daySales.forEach(
-      function(sale) {
+    // Clear old history display
 
-        total +=
-          Number(sale.quantity);
+    history.innerHTML = "";
 
 
-        const entry =
-          document.createElement("p");
+    // No sales yet
+
+    if (
+        realTimeSales.length === 0
+    ) {
+
+        history.innerHTML =
+            "<p>No sales recorded yet.</p>";
+
+        return;
+    }
 
 
-        const time =
-          new Date(sale.time);
+    // Find highest sales day
+
+    const highestDay =
+        Math.max(
+            ...realTimeSales.map(
+                sale => Number(sale.day)
+            )
+        );
 
 
-        entry.textContent =
-          time.toLocaleString() +
-          " → " +
-          sale.quantity +
-          " stocks";
+    // Display each sales day
+
+    for (
+        let day = 1;
+        day <= highestDay;
+        day++
+    ) {
+
+        const daySales =
+            realTimeSales.filter(
+                sale =>
+                    Number(sale.day) === day
+            );
+
+
+        if (
+            daySales.length === 0
+        ) {
+            continue;
+        }
+
+
+        const dayBox =
+            document.createElement("div");
+
+        dayBox.className =
+            "real-time-day";
+
+
+        const heading =
+            document.createElement("h3");
+
+        heading.textContent =
+            "Sales Day " + day;
 
 
         dayBox.appendChild(
-          entry
+            heading
         );
 
-      }
-    );
+
+        let total = 0;
 
 
-    const totalText =
-      document.createElement(
-        "strong"
-      );
+        daySales.forEach(
+            (sale) => {
+
+                const quantity =
+                    Number(sale.quantity);
+
+                total += quantity;
 
 
-    totalText.textContent =
-      "Total Sold: " +
-      total;
+                const entry =
+                    document.createElement("p");
 
 
-    dayBox.appendChild(
-      totalText
-    );
+                const time =
+                    new Date(sale.time);
 
 
-    history.appendChild(
-      dayBox
-    );
+                entry.textContent =
+                    time.toLocaleString() +
+                    " → " +
+                    quantity +
+                    " stocks";
 
-  }
+
+                dayBox.appendChild(
+                    entry
+                );
+
+            }
+        );
+
+
+        const totalText =
+            document.createElement("strong");
+
+
+        totalText.textContent =
+            "Total Sold: " +
+            total;
+
+
+        dayBox.appendChild(
+            totalText
+        );
+
+
+        history.appendChild(
+            dayBox
+        );
+
+    }
 
 }
 
@@ -551,71 +518,78 @@ function displayRealTimeSales() {
 
 function clearRealTimeSales() {
 
-  const confirmation =
-    confirm(
-      "Are you sure you want to delete all saved sales?"
+    const confirmation =
+        confirm(
+            "Are you sure you want to delete all saved sales?"
+        );
+
+
+    if (!confirmation) {
+        return;
+    }
+
+
+    realTimeSales = [];
+
+
+    localStorage.removeItem(
+        "realTimeSales"
     );
 
 
-  if (!confirmation) {
-    return;
-  }
-
-
-  realTimeSales = [];
-
-
-  localStorage.removeItem(
-    "realTimeSales"
-  );
-
-
-  displayRealTimeSales();
+    displayRealTimeSales();
 
 }
 
 
 // =====================================================
-// REAL-TIME BUTTONS
+// CONNECT REAL-TIME BUTTONS
 // =====================================================
 
 const addRealTimeButton =
-  document.getElementById(
-    "addRealTimeSale"
-  );
+    document.getElementById(
+        "addRealTimeSale"
+    );
 
 
-addRealTimeButton.addEventListener(
-  "click",
-  addRealTimeSale
-);
+if (addRealTimeButton) {
+
+    addRealTimeButton.addEventListener(
+        "click",
+        addRealTimeSale
+    );
+
+}
 
 
 const clearRealTimeButton =
-  document.getElementById(
-    "clearRealTimeSales"
-  );
+    document.getElementById(
+        "clearRealTimeSales"
+    );
 
 
-clearRealTimeButton.addEventListener(
-  "click",
-  clearRealTimeSales
-);
+if (clearRealTimeButton) {
+
+    clearRealTimeButton.addEventListener(
+        "click",
+        clearRealTimeSales
+    );
+
+}
 
 
 // =====================================================
-// LOAD SAVED DATA WHEN WEBSITE OPENS
+// LOAD SAVED SALES WHEN WEBSITE OPENS
 // =====================================================
 
 displayRealTimeSales();
 
 
 // =====================================================
-// CHECK FOR NEW SALES DAY
-// EVERY MINUTE
+// UPDATE SALES DAY AUTOMATICALLY
 // =====================================================
 
 setInterval(
-  displayRealTimeSales,
-  60000
+    displayRealTimeSales,
+    60000
 );
