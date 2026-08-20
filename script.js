@@ -1,958 +1,842 @@
 // =====================================================
-// STORE SALES MANAGER - COMPLETE VERSION
+// STORE SALES MANAGER
+// COMPLETE WORKING VERSION
 // =====================================================
 
-// =====================================================
-// GET HTML ELEMENTS
-// =====================================================
+document.addEventListener("DOMContentLoaded", function () {
 
-const productName = document.getElementById("productName");
-const productPrice = document.getElementById("productPrice");
-const addProductButton = document.getElementById("addProduct");
-const productList = document.getElementById("productList");
+    // =================================================
+    // GET HTML ELEMENTS
+    // =================================================
 
-const customerName = document.getElementById("customerName");
-const addCustomerButton = document.getElementById("addCustomer");
-const customerList = document.getElementById("customerList");
+    const productName = document.getElementById("productName");
+    const productPrice = document.getElementById("productPrice");
+    const addProductButton = document.getElementById("addProduct");
+    const productList = document.getElementById("productList");
 
-const saleCustomer = document.getElementById("saleCustomer");
-const saleProduct = document.getElementById("saleProduct");
-const saleQuantity = document.getElementById("saleQuantity");
-const selectedPrice = document.getElementById("selectedPrice");
-const saleAmount = document.getElementById("saleAmount");
-const addSaleButton = document.getElementById("addSale");
+    const customerName = document.getElementById("customerName");
+    const addCustomerButton = document.getElementById("addCustomer");
+    const customerList = document.getElementById("customerList");
 
-const currentDay = document.getElementById("currentDay");
-const dailySales = document.getElementById("dailySales");
-const customerSales = document.getElementById("customerSales");
-const overallTotal = document.getElementById("overallTotal");
-const clearAll = document.getElementById("clearAll");
+    const saleCustomer = document.getElementById("saleCustomer");
+    const saleProduct = document.getElementById("saleProduct");
+    const saleQuantity = document.getElementById("saleQuantity");
+
+    const selectedPrice = document.getElementById("selectedPrice");
+    const saleAmount = document.getElementById("saleAmount");
+    const addSaleButton = document.getElementById("addSale");
+
+    const currentDay = document.getElementById("currentDay");
+    const dailySales = document.getElementById("dailySales");
+    const customerSales = document.getElementById("customerSales");
+    const overallTotal = document.getElementById("overallTotal");
+    const clearAll = document.getElementById("clearAll");
 
 
-// =====================================================
-// LOAD DATA SAFELY
-// =====================================================
+    // =================================================
+    // LOAD DATA SAFELY
+    // =================================================
 
-function loadData(key) {
+    function loadData(key) {
 
-    try {
+        try {
 
-        const saved = localStorage.getItem(key);
+            const saved = localStorage.getItem(key);
 
-        if (!saved) {
+            if (!saved) {
+                return [];
+            }
+
+            const data = JSON.parse(saved);
+
+            return Array.isArray(data) ? data : [];
+
+        } catch (error) {
+
+            console.error("Error loading " + key, error);
+
             return [];
+
+        }
+    }
+
+
+    let products = loadData("storeProducts");
+    let customers = loadData("storeCustomers");
+    let sales = loadData("storeSales");
+
+
+    // =================================================
+    // SAVE DATA
+    // =================================================
+
+    function saveProducts() {
+
+        localStorage.setItem(
+            "storeProducts",
+            JSON.stringify(products)
+        );
+
+    }
+
+
+    function saveCustomers() {
+
+        localStorage.setItem(
+            "storeCustomers",
+            JSON.stringify(customers)
+        );
+
+    }
+
+
+    function saveSales() {
+
+        localStorage.setItem(
+            "storeSales",
+            JSON.stringify(sales)
+        );
+
+    }
+
+
+    // =================================================
+    // CREATE UNIQUE ID
+    // =================================================
+
+    function createId() {
+
+        return (
+            Date.now() +
+            "-" +
+            Math.random()
+                .toString(36)
+                .substring(2)
+        );
+
+    }
+
+
+    // =================================================
+    // DATE
+    // =================================================
+
+    function getDateString(date) {
+
+        return (
+            date.getFullYear() +
+            "-" +
+            String(date.getMonth() + 1).padStart(2, "0") +
+            "-" +
+            String(date.getDate()).padStart(2, "0")
+        );
+
+    }
+
+
+    // =================================================
+    // FIRST SALES DATE
+    // =================================================
+
+    function getFirstSalesDate() {
+
+        if (sales.length === 0) {
+
+            return getDateString(new Date());
+
         }
 
-        const data = JSON.parse(saved);
 
-        return Array.isArray(data) ? data : [];
-
-    } catch (error) {
-
-        console.error("Loading error:", error);
-
-        return [];
-    }
-}
+        const dates = sales
+            .map(sale => sale.date)
+            .filter(date => date)
+            .sort();
 
 
-// =====================================================
-// DATA
-// =====================================================
+        if (dates.length === 0) {
 
-let products = loadData("storeProducts");
-let customers = loadData("storeCustomers");
-let sales = loadData("storeSales");
+            return getDateString(new Date());
+
+        }
 
 
-// =====================================================
-// SAVE DATA
-// =====================================================
+        return dates[0];
 
-function saveProducts() {
-
-    localStorage.setItem(
-        "storeProducts",
-        JSON.stringify(products)
-    );
-}
-
-
-function saveCustomers() {
-
-    localStorage.setItem(
-        "storeCustomers",
-        JSON.stringify(customers)
-    );
-}
-
-
-function saveSales() {
-
-    localStorage.setItem(
-        "storeSales",
-        JSON.stringify(sales)
-    );
-}
-
-
-// =====================================================
-// CREATE UNIQUE ID
-// =====================================================
-
-function createId() {
-
-    return Date.now() + "-" +
-        Math.random()
-            .toString(36)
-            .substring(2, 10);
-}
-
-
-// =====================================================
-// GET TODAY'S DATE
-// =====================================================
-
-function getDateString(date) {
-
-    return (
-        date.getFullYear() +
-        "-" +
-        String(date.getMonth() + 1).padStart(2, "0") +
-        "-" +
-        String(date.getDate()).padStart(2, "0")
-    );
-}
-
-
-// =====================================================
-// GET FIRST SALES DATE
-// =====================================================
-
-function getFirstSalesDate() {
-
-    if (sales.length === 0) {
-
-        return getDateString(new Date());
     }
 
-    const dates = sales
-        .map(sale => sale.date)
-        .filter(date => date)
-        .sort();
 
-    if (dates.length === 0) {
+    // =================================================
+    // GET SALES DAY
+    // =================================================
 
-        return getDateString(new Date());
+    function getSalesDay(dateString) {
+
+        const firstDate =
+            new Date(
+                getFirstSalesDate() +
+                "T00:00:00"
+            );
+
+
+        const currentDate =
+            new Date(
+                dateString +
+                "T00:00:00"
+            );
+
+
+        const difference =
+            currentDate - firstDate;
+
+
+        return (
+            Math.floor(
+                difference /
+                (24 * 60 * 60 * 1000)
+            ) + 1
+        );
+
     }
 
-    return dates[0];
-}
+
+    // =================================================
+    // ADD PRODUCT
+    // =================================================
+
+    function addProduct() {
+
+        const name =
+            productName.value.trim();
 
 
-// =====================================================
-// GET SALES DAY
-// =====================================================
-
-function getSalesDay(dateString) {
-
-    const firstDate = new Date(
-        getFirstSalesDate() + "T00:00:00"
-    );
-
-    const currentDate = new Date(
-        dateString + "T00:00:00"
-    );
-
-    const difference =
-        currentDate - firstDate;
-
-    return (
-        Math.floor(
-            difference / (24 * 60 * 60 * 1000)
-        ) + 1
-    );
-}
+        const price =
+            Number(productPrice.value);
 
 
-// =====================================================
-// ADD PRODUCT
-// =====================================================
+        if (name === "") {
 
-function addProduct() {
+            alert("Please enter a product name.");
 
-    const name =
-        productName.value.trim();
+            productName.focus();
 
-    const price =
-        Number(productPrice.value);
+            return;
+
+        }
 
 
-    if (name === "") {
+        if (
+            productPrice.value === "" ||
+            !Number.isFinite(price) ||
+            price < 0
+        ) {
 
-        alert("Please enter a product name.");
+            alert("Please enter a valid product price.");
+
+            productPrice.focus();
+
+            return;
+
+        }
+
+
+        const exists =
+            products.some(
+                product =>
+                    product.name.toLowerCase() ===
+                    name.toLowerCase()
+            );
+
+
+        if (exists) {
+
+            alert("This product already exists.");
+
+            productName.focus();
+
+            return;
+
+        }
+
+
+        products.push({
+
+            id: createId(),
+
+            name: name,
+
+            price: price
+
+        });
+
+
+        saveProducts();
+
+
+        productName.value = "";
+        productPrice.value = "";
+
+
+        displayProducts();
+        updateProductDropdown();
+
 
         productName.focus();
 
-        return;
     }
 
 
-    if (
-        productPrice.value === "" ||
-        !Number.isFinite(price) ||
-        price < 0
-    ) {
+    // =================================================
+    // DISPLAY PRODUCTS
+    // =================================================
 
-        alert("Please enter a valid product price.");
+    function displayProducts() {
 
-        productPrice.focus();
+        productList.innerHTML = "";
 
-        return;
-    }
 
+        if (products.length === 0) {
 
-    const exists =
-        products.some(
-            product =>
-                product.name.toLowerCase() ===
-                name.toLowerCase()
-        );
+            productList.innerHTML =
+                "<p>No products added yet.</p>";
 
+            return;
 
-    if (exists) {
-
-        alert("This product already exists.");
-
-        return;
-    }
-
-
-    products.push({
-
-        id: createId(),
-
-        name: name,
-
-        price: price
-
-    });
-
-
-    saveProducts();
-
-
-    productName.value = "";
-    productPrice.value = "";
-
-
-    displayProducts();
-    updateProductDropdown();
-
-
-    productName.focus();
-}
-
-
-// =====================================================
-// DISPLAY PRODUCTS
-// =====================================================
-
-function displayProducts() {
-
-    productList.innerHTML = "";
-
-
-    if (products.length === 0) {
-
-        productList.innerHTML =
-            "<p>No products added yet.</p>";
-
-        return;
-    }
-
-
-    products.forEach(product => {
-
-        const box =
-            document.createElement("div");
-
-
-        const text =
-            document.createElement("p");
-
-
-        text.textContent =
-            product.name +
-            " — ₹" +
-            Number(product.price).toFixed(2);
-
-
-        const deleteButton =
-            document.createElement("button");
-
-
-        deleteButton.type = "button";
-
-        deleteButton.textContent = "Delete";
-
-
-        deleteButton.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    !confirm(
-                        "Delete " +
-                        product.name +
-                        "?"
-                    )
-                ) {
-                    return;
-                }
-
-
-                products =
-                    products.filter(
-                        item =>
-                            item.id !== product.id
-                    );
-
-
-                saveProducts();
-
-                displayProducts();
-
-                updateProductDropdown();
-            }
-        );
-
-
-        box.appendChild(text);
-
-        box.appendChild(deleteButton);
-
-        productList.appendChild(box);
-
-    });
-}
-
-
-// =====================================================
-// UPDATE PRODUCT DROPDOWN
-// =====================================================
-
-function updateProductDropdown() {
-
-    saleProduct.innerHTML = "";
-
-
-    const first =
-        document.createElement("option");
-
-
-    first.value = "";
-
-    first.textContent =
-        "Select Product";
-
-
-    saleProduct.appendChild(first);
-
-
-    products.forEach(product => {
-
-        const option =
-            document.createElement("option");
-
-
-        option.value = product.id;
-
-        option.textContent = product.name;
-
-
-        saleProduct.appendChild(option);
-
-    });
-
-
-    updateSaleAmount();
-}
-
-
-// =====================================================
-// ADD CUSTOMER
-// =====================================================
-
-function addCustomer() {
-
-    const name =
-        customerName.value.trim();
-
-
-    if (name === "") {
-
-        alert("Please enter a customer name.");
-
-        customerName.focus();
-
-        return;
-    }
-
-
-    const exists =
-        customers.some(
-            customer =>
-                customer.name.toLowerCase() ===
-                name.toLowerCase()
-        );
-
-
-    if (exists) {
-
-        alert("This customer already exists.");
-
-        return;
-    }
-
-
-    customers.push({
-
-        id: createId(),
-
-        name: name
-
-    });
-
-
-    saveCustomers();
-
-
-    customerName.value = "";
-
-
-    displayCustomers();
-
-    updateCustomerDropdown();
-
-
-    customerName.focus();
-}
-
-
-// =====================================================
-// DISPLAY CUSTOMERS
-// =====================================================
-
-function displayCustomers() {
-
-    customerList.innerHTML = "";
-
-
-    if (customers.length === 0) {
-
-        customerList.innerHTML =
-            "<p>No customers added yet.</p>";
-
-        return;
-    }
-
-
-    customers.forEach(customer => {
-
-        const box =
-            document.createElement("div");
-
-
-        const text =
-            document.createElement("p");
-
-
-        text.textContent =
-            customer.name;
-
-
-        const deleteButton =
-            document.createElement("button");
-
-
-        deleteButton.type = "button";
-
-        deleteButton.textContent = "Delete";
-
-
-        deleteButton.addEventListener(
-            "click",
-            () => {
-
-                if (
-                    !confirm(
-                        "Delete " +
-                        customer.name +
-                        "?"
-                    )
-                ) {
-                    return;
-                }
-
-
-                customers =
-                    customers.filter(
-                        item =>
-                            item.id !== customer.id
-                    );
-
-
-                saveCustomers();
-
-                displayCustomers();
-
-                updateCustomerDropdown();
-            }
-        );
-
-
-        box.appendChild(text);
-
-        box.appendChild(deleteButton);
-
-        customerList.appendChild(box);
-
-    });
-}
-
-
-// =====================================================
-// UPDATE CUSTOMER DROPDOWN
-// =====================================================
-
-function updateCustomerDropdown() {
-
-    saleCustomer.innerHTML = "";
-
-
-    const first =
-        document.createElement("option");
-
-
-    first.value = "";
-
-    first.textContent =
-        "Walk-in / No Regular Customer";
-
-
-    saleCustomer.appendChild(first);
-
-
-    customers.forEach(customer => {
-
-        const option =
-            document.createElement("option");
-
-
-        option.value = customer.id;
-
-        option.textContent = customer.name;
-
-
-        saleCustomer.appendChild(option);
-
-    });
-}
-
-
-// =====================================================
-// UPDATE PRICE AND SALE AMOUNT
-// =====================================================
-
-function updateSaleAmount() {
-
-    const product =
-        products.find(
-            item =>
-                item.id === saleProduct.value
-        );
-
-
-    if (!product) {
-
-        selectedPrice.textContent =
-            "Price: ₹0.00";
-
-        saleAmount.textContent =
-            "Sale Amount: ₹0.00";
-
-        return;
-    }
-
-
-    selectedPrice.textContent =
-        "Price: ₹" +
-        Number(product.price).toFixed(2);
-
-
-    const quantity =
-        Number(saleQuantity.value);
-
-
-    if (
-        !Number.isInteger(quantity) ||
-        quantity <= 0
-    ) {
-
-        saleAmount.textContent =
-            "Sale Amount: ₹0.00";
-
-        return;
-    }
-
-
-    const amount =
-        Number(product.price) * quantity;
-
-
-    saleAmount.textContent =
-        "Sale Amount: ₹" +
-        amount.toFixed(2);
-}
-
-
-// =====================================================
-// ADD SALE
-// =====================================================
-
-function addSale() {
-
-    const product =
-        products.find(
-            item =>
-                item.id === saleProduct.value
-        );
-
-
-    const quantity =
-        Number(saleQuantity.value);
-
-
-    const customer =
-        customers.find(
-            item =>
-                item.id === saleCustomer.value
-        );
-
-
-    if (!product) {
-
-        alert("Please select a product.");
-
-        saleProduct.focus();
-
-        return;
-    }
-
-
-    if (
-        saleQuantity.value === "" ||
-        !Number.isInteger(quantity) ||
-        quantity <= 0
-    ) {
-
-        alert("Please enter a valid quantity.");
-
-        saleQuantity.focus();
-
-        return;
-    }
-
-
-    const now =
-        new Date();
-
-
-    const date =
-        getDateString(now);
-
-
-    const day =
-        getSalesDay(date);
-
-
-    const amount =
-        Number(product.price) * quantity;
-
-
-    const newSale = {
-
-        id: createId(),
-
-        date: date,
-
-        day: day,
-
-        time: now.toISOString(),
-
-        productId: product.id,
-
-        productName: product.name,
-
-        price: Number(product.price),
-
-        quantity: quantity,
-
-        amount: amount,
-
-        customerId:
-            customer ? customer.id : "",
-
-        customerName:
-            customer ? customer.name : ""
-
-    };
-
-
-    sales.push(newSale);
-
-
-    saveSales();
-
-
-    saleProduct.value = "";
-
-    saleQuantity.value = "";
-
-    saleCustomer.value = "";
-
-
-    selectedPrice.textContent =
-        "Price: ₹0.00";
-
-    saleAmount.textContent =
-        "Sale Amount: ₹0.00";
-
-
-    displayAll();
-
-    saleProduct.focus();
-}
-
-
-// =====================================================
-// DAILY SALES
-// =====================================================
-
-function displayDailySales() {
-
-    dailySales.innerHTML = "";
-
-
-    if (sales.length === 0) {
-
-        dailySales.innerHTML =
-            "<p>No sales recorded yet.</p>";
-
-        return;
-    }
-
-
-    const days = {};
-
-
-    sales.forEach(sale => {
-
-        const day =
-            Number(sale.day);
-
-
-        if (!days[day]) {
-
-            days[day] = [];
         }
 
 
-        days[day].push(sale);
-
-    });
-
-
-    Object.keys(days)
-        .map(Number)
-        .sort((a, b) => a - b)
-        .forEach(day => {
+        products.forEach(product => {
 
             const box =
                 document.createElement("div");
 
 
-            box.className =
-                "real-time-day";
+            box.className = "product-item";
 
 
-            const heading =
-                document.createElement("h3");
-
-
-            heading.textContent =
-                "📅 Sales Day " + day;
-
-
-            box.appendChild(heading);
-
-
-            const productTotals = {};
-
-            let dayTotal = 0;
-
-            let totalQuantity = 0;
-
-
-            days[day].forEach(sale => {
-
-                const quantity =
-                    Number(sale.quantity);
-
-                const amount =
-                    Number(sale.amount);
-
-
-                dayTotal += amount;
-
-                totalQuantity += quantity;
-
-
-                if (
-                    !productTotals[
-                        sale.productName
-                    ]
-                ) {
-
-                    productTotals[
-                        sale.productName
-                    ] = {
-
-                        quantity: 0,
-
-                        amount: 0
-                    };
-                }
-
-
-                productTotals[
-                    sale.productName
-                ].quantity += quantity;
-
-
-                productTotals[
-                    sale.productName
-                ].amount += amount;
-
-            });
-
-
-            Object.keys(productTotals)
-                .forEach(productName => {
-
-                    const data =
-                        productTotals[
-                            productName
-                        ];
-
-
-                    const row =
-                        document.createElement("p");
-
-
-                    row.textContent =
-                        "📦 " +
-                        productName +
-                        " — " +
-                        data.quantity +
-                        " stocks = ₹" +
-                        data.amount.toFixed(2);
-
-
-                    box.appendChild(row);
-
-                });
-
-
-            const total =
+            const text =
                 document.createElement("p");
 
 
-            total.innerHTML =
-                "<strong>" +
-                "Day " +
-                day +
-                " Grand Total: ₹" +
-                dayTotal.toFixed(2) +
-                "</strong>" +
-                "<br>" +
-                "Total Stocks: " +
-                totalQuantity;
+            text.textContent =
+                product.name +
+                " — ₹" +
+                Number(product.price).toFixed(2);
 
 
-            box.appendChild(total);
+            const deleteButton =
+                document.createElement("button");
 
 
-            dailySales.appendChild(box);
+            deleteButton.type = "button";
 
-        });
-}
-
-
-// =====================================================
-// CUSTOMER SALES
-// =====================================================
-
-function displayCustomerSales() {
-
-    customerSales.innerHTML = "";
+            deleteButton.textContent = "Delete";
 
 
-    let found = false;
+            deleteButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        !confirm(
+                            "Delete " +
+                            product.name +
+                            "?"
+                        )
+                    ) {
+
+                        return;
+
+                    }
 
 
-    customers.forEach(customer => {
+                    products =
+                        products.filter(
+                            item =>
+                                item.id !== product.id
+                        );
 
-        const records =
-            sales.filter(
-                sale =>
-                    sale.customerId ===
-                    customer.id
+
+                    saveProducts();
+
+                    displayProducts();
+
+                    updateProductDropdown();
+
+                }
             );
 
 
-        if (records.length === 0) {
+            box.appendChild(text);
+
+            box.appendChild(deleteButton);
+
+            productList.appendChild(box);
+
+        });
+
+    }
+
+
+    // =================================================
+    // PRODUCT DROPDOWN
+    // =================================================
+
+    function updateProductDropdown() {
+
+        saleProduct.innerHTML = "";
+
+
+        const firstOption =
+            document.createElement("option");
+
+
+        firstOption.value = "";
+
+        firstOption.textContent =
+            "Select Product";
+
+
+        saleProduct.appendChild(firstOption);
+
+
+        products.forEach(product => {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = product.id;
+
+            option.textContent = product.name;
+
+
+            saleProduct.appendChild(option);
+
+        });
+
+
+        updateSaleAmount();
+
+    }
+
+
+    // =================================================
+    // ADD CUSTOMER
+    // =================================================
+
+    function addCustomer() {
+
+        const name =
+            customerName.value.trim();
+
+
+        if (name === "") {
+
+            alert("Please enter a customer name.");
+
+            customerName.focus();
+
             return;
+
         }
 
 
-        found = true;
+        const exists =
+            customers.some(
+                customer =>
+                    customer.name.toLowerCase() ===
+                    name.toLowerCase()
+            );
 
 
-        const box =
-            document.createElement("div");
+        if (exists) {
+
+            alert("This customer already exists.");
+
+            customerName.focus();
+
+            return;
+
+        }
 
 
-        box.className =
-            "customer-sales";
+        customers.push({
+
+            id: createId(),
+
+            name: name
+
+        });
 
 
-        const heading =
-            document.createElement("h3");
+        saveCustomers();
 
 
-        heading.textContent =
-            "👤 " + customer.name;
+        customerName.value = "";
 
 
-        box.appendChild(heading);
+        displayCustomers();
+        updateCustomerDropdown();
+
+
+        customerName.focus();
+
+    }
+
+
+    // =================================================
+    // DISPLAY CUSTOMERS
+    // =================================================
+
+    function displayCustomers() {
+
+        customerList.innerHTML = "";
+
+
+        if (customers.length === 0) {
+
+            customerList.innerHTML =
+                "<p>No customers added yet.</p>";
+
+            return;
+
+        }
+
+
+        customers.forEach(customer => {
+
+            const box =
+                document.createElement("div");
+
+
+            box.className = "customer-item";
+
+
+            const text =
+                document.createElement("p");
+
+
+            text.textContent =
+                customer.name;
+
+
+            const deleteButton =
+                document.createElement("button");
+
+
+            deleteButton.type = "button";
+
+            deleteButton.textContent = "Delete";
+
+
+            deleteButton.addEventListener(
+                "click",
+                function () {
+
+                    if (
+                        !confirm(
+                            "Delete " +
+                            customer.name +
+                            "?"
+                        )
+                    ) {
+
+                        return;
+
+                    }
+
+
+                    customers =
+                        customers.filter(
+                            item =>
+                                item.id !== customer.id
+                        );
+
+
+                    saveCustomers();
+
+                    displayCustomers();
+
+                    updateCustomerDropdown();
+
+                }
+            );
+
+
+            box.appendChild(text);
+
+            box.appendChild(deleteButton);
+
+            customerList.appendChild(box);
+
+        });
+
+    }
+
+
+    // =================================================
+    // CUSTOMER DROPDOWN
+    // =================================================
+
+    function updateCustomerDropdown() {
+
+        saleCustomer.innerHTML = "";
+
+
+        const firstOption =
+            document.createElement("option");
+
+
+        firstOption.value = "";
+
+        firstOption.textContent =
+            "Walk-in / No Regular Customer";
+
+
+        saleCustomer.appendChild(firstOption);
+
+
+        customers.forEach(customer => {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = customer.id;
+
+            option.textContent = customer.name;
+
+
+            saleCustomer.appendChild(option);
+
+        });
+
+    }
+
+
+    // =================================================
+    // UPDATE PRICE + SALE AMOUNT
+    // =================================================
+
+    function updateSaleAmount() {
+
+        const product =
+            products.find(
+                item =>
+                    item.id === saleProduct.value
+            );
+
+
+        if (!product) {
+
+            selectedPrice.textContent =
+                "Price: ₹0.00";
+
+
+            saleAmount.textContent =
+                "Sale Amount: ₹0.00";
+
+
+            return;
+
+        }
+
+
+        selectedPrice.textContent =
+            "Price: ₹" +
+            Number(product.price).toFixed(2);
+
+
+        const quantity =
+            Number(saleQuantity.value);
+
+
+        if (
+            !Number.isInteger(quantity) ||
+            quantity <= 0
+        ) {
+
+            saleAmount.textContent =
+                "Sale Amount: ₹0.00";
+
+            return;
+
+        }
+
+
+        const amount =
+            Number(product.price) *
+            quantity;
+
+
+        saleAmount.textContent =
+            "Sale Amount: ₹" +
+            amount.toFixed(2);
+
+    }
+
+
+    // =================================================
+    // ADD SALE
+    // =================================================
+
+    function addSale() {
+
+        const product =
+            products.find(
+                item =>
+                    item.id === saleProduct.value
+            );
+
+
+        const customer =
+            customers.find(
+                item =>
+                    item.id === saleCustomer.value
+            );
+
+
+        const quantity =
+            Number(saleQuantity.value);
+
+
+        // PRODUCT CHECK
+
+        if (!product) {
+
+            alert("Please select a product.");
+
+            saleProduct.focus();
+
+            return;
+
+        }
+
+
+        // QUANTITY CHECK
+
+        if (
+            saleQuantity.value === "" ||
+            !Number.isInteger(quantity) ||
+            quantity <= 0
+        ) {
+
+            alert("Please enter a valid quantity.");
+
+            saleQuantity.focus();
+
+            return;
+
+        }
+
+
+        const now =
+            new Date();
+
+
+        const date =
+            getDateString(now);
+
+
+        const day =
+            getSalesDay(date);
+
+
+        const amount =
+            Number(product.price) *
+            quantity;
+
+
+        const newSale = {
+
+            id: createId(),
+
+            date: date,
+
+            day: day,
+
+            time: now.toISOString(),
+
+            productId: product.id,
+
+            productName: product.name,
+
+            price: Number(product.price),
+
+            quantity: quantity,
+
+            amount: amount,
+
+            customerId:
+                customer
+                    ? customer.id
+                    : "",
+
+            customerName:
+                customer
+                    ? customer.name
+                    : ""
+
+        };
+
+
+        // SAVE SALE
+
+        sales.push(newSale);
+
+        saveSales();
+
+
+        // CLEAR INPUT
+
+        saleProduct.value = "";
+
+        saleQuantity.value = "";
+
+        saleCustomer.value = "";
+
+
+        selectedPrice.textContent =
+            "Price: ₹0.00";
+
+
+        saleAmount.textContent =
+            "Sale Amount: ₹0.00";
+
+
+        // REFRESH EVERYTHING
+
+        displayAll();
+
+
+        saleProduct.focus();
+
+    }
+
+
+    // =================================================
+    // DAILY SALES
+    // =================================================
+
+    function displayDailySales() {
+
+        dailySales.innerHTML = "";
+
+
+        if (sales.length === 0) {
+
+            dailySales.innerHTML =
+                "<p>No sales recorded yet.</p>";
+
+            return;
+
+        }
 
 
         const days = {};
 
 
-        records.forEach(sale => {
+        sales.forEach(sale => {
 
             const day =
                 Number(sale.day);
@@ -961,6 +845,7 @@ function displayCustomerSales() {
             if (!days[day]) {
 
                 days[day] = [];
+
             }
 
 
@@ -969,29 +854,35 @@ function displayCustomerSales() {
         });
 
 
-        let customerOverall = 0;
-
-
         Object.keys(days)
             .map(Number)
             .sort((a, b) => a - b)
             .forEach(day => {
 
-                const dayTitle =
-                    document.createElement("h4");
+                const box =
+                    document.createElement("div");
 
 
-                dayTitle.textContent =
-                    "Day " + day;
+                box.className =
+                    "real-time-day";
 
 
-                box.appendChild(dayTitle);
+                const heading =
+                    document.createElement("h3");
 
 
-                let dayTotal = 0;
+                heading.textContent =
+                    "📅 Sales Day " + day;
+
+
+                box.appendChild(heading);
 
 
                 const productTotals = {};
+
+                let dayTotal = 0;
+
+                let totalQuantity = 0;
 
 
                 days[day].forEach(sale => {
@@ -999,13 +890,14 @@ function displayCustomerSales() {
                     const quantity =
                         Number(sale.quantity);
 
+
                     const amount =
                         Number(sale.amount);
 
 
                     dayTotal += amount;
 
-                    customerOverall += amount;
+                    totalQuantity += quantity;
 
 
                     if (
@@ -1021,7 +913,9 @@ function displayCustomerSales() {
                             quantity: 0,
 
                             amount: 0
+
                         };
+
                     }
 
 
@@ -1037,13 +931,13 @@ function displayCustomerSales() {
                 });
 
 
+                // PRODUCTS SEPARATELY
+
                 Object.keys(productTotals)
-                    .forEach(productName => {
+                    .forEach(product => {
 
                         const data =
-                            productTotals[
-                                productName
-                            ];
+                            productTotals[product];
 
 
                         const row =
@@ -1052,7 +946,7 @@ function displayCustomerSales() {
 
                         row.textContent =
                             "📦 " +
-                            productName +
+                            product +
                             " — " +
                             data.quantity +
                             " stocks = ₹" +
@@ -1064,36 +958,114 @@ function displayCustomerSales() {
                     });
 
 
-                const dayTotalText =
+                // DAILY GRAND TOTAL
+
+                const total =
                     document.createElement("p");
 
 
-                dayTotalText.innerHTML =
+                total.innerHTML =
                     "<strong>" +
                     "Day " +
                     day +
-                    " Total: ₹" +
+                    " Grand Total: ₹" +
                     dayTotal.toFixed(2) +
-                    "</strong>";
+                    "</strong>" +
+                    "<br>Total Stocks: " +
+                    totalQuantity;
 
 
-                box.appendChild(dayTotalText);
+                box.appendChild(total);
+
+
+                dailySales.appendChild(box);
+
+            });
+
+    }
+
+
+    // =================================================
+    // CUSTOMER SALES
+    // =================================================
+
+    function displayCustomerSales() {
+
+        customerSales.innerHTML = "";
+
+
+        let found = false;
+
+
+        customers.forEach(customer => {
+
+            const records =
+                sales.filter(
+                    sale =>
+                        sale.customerId ===
+                        customer.id
+                );
+
+
+            if (records.length === 0) {
+
+                return;
+
+            }
+
+
+            found = true;
+
+
+            const box =
+                document.createElement("div");
+
+
+            box.className =
+                "customer-sales";
+
+
+            const heading =
+                document.createElement("h3");
+
+
+            heading.textContent =
+                "👤 " + customer.name;
+
+
+            box.appendChild(heading);
+
+
+            // GROUP CUSTOMER SALES BY DAY
+
+            const days = {};
+
+
+            records.forEach(sale => {
+
+                const day =
+                    Number(sale.day);
+
+
+                if (!days[day]) {
+
+                    days[day] = [];
+
+                }
+
+
+                days[day].push(sale);
 
             });
 
 
-        // Customer overall total
-        // This is separate for EACH customer.
+            // CUSTOMER OVERALL TOTAL
 
-        const overall =
-            document.createElement("p");
+            let customerOverall = 0;
 
 
-        overall.innerHTML =
-            "<strong>" +
-            "💰 " +
-            customer.name +
-            "
+            Object.keys(days)
+   
 
 
    
