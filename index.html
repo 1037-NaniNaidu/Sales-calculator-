@@ -1,158 +1,200 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#1565c0">
-  <title>Sales Calculator</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1565c0">
+
+    <title>Sales Calculator</title>
+
+    <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-  <main class="app">
+<main class="app">
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
 
     <header>
-      <h1>Sales Calculator</h1>
-      <p>Track daily stock sales and calculate your total.</p>
+        <h1>Sales Calculator</h1>
+
+        <p>
+            Calculate and track your sales every day.
+        </p>
     </header>
 
 
-    <!-- =================================
-         EXISTING SALES CALCULATOR
-    ================================== -->
+    <!-- =========================================
+         MAIN SALES SETTINGS
+    ========================================== -->
 
     <section class="card">
 
-      <label for="cost">
-        Cost per stock (₹)
-      </label>
+        <h2>Sales Settings</h2>
 
-      <input
-        id="cost"
-        type="number"
-        min="0"
-        step="0.01"
-        placeholder="e.g. 50"
-      >
+        <label for="cost">
+            Cost per stock (₹)
+        </label>
+
+        <input
+            id="cost"
+            type="number"
+            min="0"
+            step="0.01"
+            placeholder="e.g. 50"
+        >
 
 
-      <label for="days">
-        Number of days
-      </label>
+        <label for="days">
+            Number of days
+        </label>
 
-      <input
-        id="days"
-        type="number"
-        min="1"
-        max="366"
-        placeholder="e.g. 30"
-      >
+        <input
+            id="days"
+            type="number"
+            min="1"
+            max="366"
+            placeholder="e.g. 30"
+        >
 
-      <button id="start">
-        Start
-      </button>
+
+        <button id="start">
+            Start Calculator
+        </button>
 
     </section>
 
 
+    <!-- =========================================
+         LIVE SALES ENTRY
+    ========================================== -->
+
+    <section class="card">
+
+        <h2>Live Sales</h2>
+
+        <p>
+            Add the quantity whenever a sale happens.
+        </p>
+
+
+        <h3 id="realTimeDay">
+            Sales Day 1
+        </h3>
+
+
+        <label for="realTimeQuantity">
+            Quantity Sold
+        </label>
+
+        <input
+            id="realTimeQuantity"
+            type="number"
+            min="1"
+            step="1"
+            placeholder="Enter quantity sold"
+        >
+
+
+        <button id="addRealTimeSale">
+            Add Sale
+        </button>
+
+
+        <div class="daily-live-total">
+
+            <h3>
+                Today's Total
+            </h3>
+
+            <p id="realTimeTotal">
+                0 stocks = ₹0.00
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         DAILY SALES
+    ========================================== -->
+
     <section
-      id="dailySection"
-      class="card hidden"
+        id="dailySection"
+        class="card hidden"
     >
 
-      <h2>Daily Sales</h2>
+        <h2>Daily Sales</h2>
 
-      <div id="dailyInputs"></div>
+        <p>
+            Your sales for each day are shown separately below.
+        </p>
 
-      <button id="calculate">
-        Calculate Sales
-      </button>
+        <div id="dailyInputs"></div>
+
+        <button id="calculate">
+            Calculate Total
+        </button>
 
     </section>
 
+
+    <!-- =========================================
+         SALES HISTORY
+    ========================================== -->
+
+    <section class="card">
+
+        <h2>Sales History</h2>
+
+        <div id="realTimeHistory">
+
+            <p>
+                No sales recorded yet.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         GRAND TOTAL
+    ========================================== -->
 
     <section
-      id="result"
-      class="card result hidden">
-    </section>
+        id="result"
+        class="card result hidden"
+    ></section>
 
+
+    <!-- =========================================
+         CLEAR EVERYTHING
+    ========================================== -->
 
     <button
-      id="clear"
-      class="secondary">
-      Clear
+        id="clear"
+        class="secondary"
+    >
+        Clear Calculator
     </button>
 
 
-    <!-- =================================
-         REAL-TIME SALES TRACKER
-    ================================== -->
-
-    <section class="card sales-tracker">
-
-      <h2>Real-Time Sales Tracker</h2>
-
-      <p>
-        Record each sale when it happens.
-      </p>
-
-
-      <!-- Current sales day -->
-
-      <h3 id="realTimeDay">
-        Sales Day 1
-      </h3>
-
-
-      <!-- Quantity input -->
-
-      <label for="realTimeQuantity">
-        Quantity Sold
-      </label>
-
-      <input
-        id="realTimeQuantity"
-        type="number"
-        min="1"
-        step="1"
-        placeholder="Enter quantity sold"
-      >
-
-
-      <button id="addRealTimeSale">
-        Add Sale
-      </button>
-
-
-      <!-- Current day total -->
-
-      <h3 id="realTimeTotal">
-        Today's Total: 0
-      </h3>
-
-
-      <!-- History -->
-
-      <h2>Sales History</h2>
-
-      <div id="realTimeHistory">
-        <p>No sales recorded yet.</p>
-      </div>
-
-
-      <button
+    <button
         id="clearRealTimeSales"
-        class="secondary">
+        class="secondary"
+    >
         Clear Sales History
-      </button>
+    </button>
 
-    </section>
-
-  </main>
+</main>
 
 
-  <script src="script.js"></script>
+<script src="script.js"></script>
 
 </body>
-  </html>
+</html>
