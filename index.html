@@ -1,139 +1,240 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1565c0">
 
-    <title>Sales Calculator</title>
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="theme-color"
+        content="#1565c0"
+    >
+
+    <title>Store Sales Manager</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
+
 
 <body>
 
 <main class="app">
 
-    <!-- ================================
-         COMBINED SALES CALCULATOR
-    ================================= -->
+    <!-- HEADER -->
 
     <header>
-        <h1>Sales Calculator</h1>
-        <p>Enter your sales once and track them automatically.</p>
+        <h1>Store Sales Manager</h1>
+
+        <p>
+            Manage products, customers and daily sales.
+        </p>
     </header>
 
 
+    <!-- =========================================
+         PRODUCTS
+    ========================================== -->
+
     <section class="card">
 
-        <h2>Sales Calculator</h2>
+        <h2>📦 Products</h2>
 
-        <!-- COST -->
+        <p>
+            Add your products and save their prices.
+        </p>
 
-        <label for="cost">
-            Cost per stock (₹)
+        <label for="productName">
+            Product Name
         </label>
 
         <input
-            id="cost"
+            id="productName"
+            type="text"
+            placeholder="Example: Shampoo"
+        >
+
+        <label for="productPrice">
+            Price (₹)
+        </label>
+
+        <input
+            id="productPrice"
             type="number"
             min="0"
             step="0.01"
-            placeholder="Enter cost per stock"
+            placeholder="Example: 50"
         >
 
+        <button id="addProduct">
+            Add Product
+        </button>
 
-        <!-- CURRENT DAY -->
+        <div id="productList">
+            <p>No products added yet.</p>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         REGULAR CUSTOMERS
+    ========================================== -->
+
+    <section class="card">
+
+        <h2>👤 Regular Customers</h2>
+
+        <p>
+            Add customers who regularly buy from your store.
+        </p>
+
+        <label for="customerName">
+            Customer Name
+        </label>
+
+        <input
+            id="customerName"
+            type="text"
+            placeholder="Example: Abhi"
+        >
+
+        <button id="addCustomer">
+            Add Customer
+        </button>
+
+        <div id="customerList">
+            <p>No regular customers added yet.</p>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         RECORD SALE
+    ========================================== -->
+
+    <section class="card">
+
+        <h2>🧾 Record Sale</h2>
 
         <h3 id="currentDay">
             Sales Day 1
         </h3>
 
+        <label for="saleProduct">
+            Product
+        </label>
 
-        <!-- SINGLE SALES INPUT -->
+        <select id="saleProduct">
+            <option value="">
+                Select Product
+            </option>
+        </select>
 
-        <label for="quantity">
-            Stocks Sold
+
+        <label for="saleCustomer">
+            Regular Customer
+        </label>
+
+        <select id="saleCustomer">
+
+            <option value="">
+                No Regular Customer
+            </option>
+
+        </select>
+
+
+        <label for="saleQuantity">
+            Quantity
         </label>
 
         <input
-            id="quantity"
+            id="saleQuantity"
             type="number"
             min="1"
             step="1"
-            placeholder="Enter stocks sold"
+            placeholder="Enter quantity"
         >
 
+        <p id="selectedPrice">
+            Price: ₹0.00
+        </p>
+
+        <p id="saleAmount">
+            Sale Amount: ₹0.00
+        </p>
 
         <button id="addSale">
             Add Sale
         </button>
 
-
-        <!-- TODAY'S CALCULATION -->
-
-        <div class="daily-total">
-
-            <h3>Today's Total</h3>
-
-            <p id="todayTotal">
-                0 stocks = ₹0.00
-            </p>
-
-        </div>
-
     </section>
 
 
-    <!-- ================================
-         AUTOMATIC REAL-TIME TRACKER
-    ================================= -->
+    <!-- =========================================
+         DAILY SALES
+    ========================================== -->
 
     <section class="card">
 
-        <h2>Real-Time Sales Tracker</h2>
+        <h2>📅 Daily Sales</h2>
 
-        <p>
-            Your sales are automatically transferred here.
-        </p>
-
-
-        <div id="salesHistory">
-
-            <p>
-                No sales recorded yet.
-            </p>
-
-        </div>
-
-
-        <!-- GRAND TOTAL -->
-
-        <div
-            id="grandTotal"
-            class="grand-total"
-        >
-
-            <h2>Grand Total</h2>
-
-            <p>
-                0 stocks = ₹0.00
-            </p>
-
+        <div id="dailySales">
+            <p>No sales recorded yet.</p>
         </div>
 
     </section>
 
 
-    <!-- ================================
-         CLEAR
-    ================================= -->
+    <!-- =========================================
+         CUSTOMER SALES
+    ========================================== -->
+
+    <section class="card">
+
+        <h2>👥 Regular Customer Sales</h2>
+
+        <div id="customerSales">
+            <p>No customer sales recorded yet.</p>
+        </div>
+
+    </section>
+
+
+    <!-- =========================================
+         OVERALL STORE TOTAL
+    ========================================== -->
+
+    <section
+        class="card result"
+        id="overallTotal"
+    >
+
+        <h2>
+            💰 Overall Store Total
+        </h2>
+
+        <p>
+            0 items = ₹0.00
+        </p>
+
+    </section>
+
+
+    <!-- =========================================
+         CLEAR SALES
+    ========================================== -->
 
     <button
-        id="clearSales"
+        id="clearAll"
         class="secondary"
     >
-        Clear All Sales
+        Clear All Sales Data
     </button>
 
 </main>
@@ -142,4 +243,5 @@
 <script src="script.js"></script>
 
 </body>
-</html>
+
+        </html>
