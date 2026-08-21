@@ -88,3 +88,40 @@ h2 { margin-top: 0; }
 .result h2 { margin-bottom: 10px; }
 .summary-row { padding: 5px 0; }
 .total { font-weight: 800; font-size: 20px; }
+select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #c6cdd4;
+  border-radius: 10px;
+  font-size: 17px;
+  margin-bottom: 8px;
+  background: white;
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid #e1e5e8;
+  margin: 12px 0;
+}
+
+small {
+  color: #68737d;
+}
+
+#customerList button {
+  margin-top: 10px;
+}
+
+#productList .day {
+  background: #f8fafc;
+}
+
+#salesHistory .day {
+  background: #fafafa;
+}
+
+@media print {
+  body {
+    background: white;
+  }
+}
