@@ -1,4 +1,3 @@
-alert("SCRIPT.JS IS WORKING");
 document.addEventListener("DOMContentLoaded", function () {
 
     // ==========================================
@@ -26,22 +25,22 @@ document.addEventListener("DOMContentLoaded", function () {
     const customerList =
         document.getElementById("customerList");
 
-    const addCustomer =
+    const addCustomerButton =
         document.getElementById("addCustomer");
 
-    const saveCustomer =
+    const saveCustomerButton =
         document.getElementById("saveCustomer");
 
-    const cancelCustomer =
+    const cancelCustomerButton =
         document.getElementById("cancelCustomer");
 
     const backButton =
         document.getElementById("backButton");
 
-    const addProduct =
+    const addProductButton =
         document.getElementById("addProduct");
 
-    const printSales =
+    const printSalesButton =
         document.getElementById("printSales");
 
     const newCustomerName =
@@ -52,6 +51,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const printCustomerName =
         document.getElementById("printCustomerName");
+
+    const printMonthName =
+        document.getElementById("printMonthName");
 
     const productName =
         document.getElementById("productName");
@@ -68,8 +70,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const saleMonth =
         document.getElementById("saleMonth");
 
-    const saleDay =
-        document.getElementById("saleDay");
+    const monthMessage =
+        document.getElementById("monthMessage");
 
     const productMessage =
         document.getElementById("productMessage");
@@ -85,7 +87,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // LOAD CUSTOMERS
+    // MONTH NAMES
+    // ==========================================
+
+    const monthNames = [
+        "",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
+
+
+    // ==========================================
+    // LOAD DATA
     // ==========================================
 
     function loadCustomers() {
@@ -116,6 +139,10 @@ document.addEventListener("DOMContentLoaded", function () {
                     customer.prices = {};
                 }
 
+                if (typeof customer.month !== "number") {
+                    customer.month = null;
+                }
+
                 return customer;
 
             });
@@ -134,46 +161,47 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function saveData() {
 
-        localStorage.setItem(
-            "storeCustomers",
-            JSON.stringify(customers)
-        );
+        try {
+
+            localStorage.setItem(
+                "storeCustomers",
+                JSON.stringify(customers)
+            );
+
+        } catch (error) {
+
+            alert(
+                "The browser could not save the data."
+            );
+
+        }
+    }
+
+
+    // ==========================================
+    // MONEY
+    // ==========================================
+
+    function money(value) {
+
+        return Number(value || 0).toFixed(2);
 
     }
 
 
     // ==========================================
-    // MONTH NAMES
+    // CURRENT DATE
     // ==========================================
 
-    const monthNames = [
-        "",
-        "January",
-        "February",
-        "March",
-        "April",
-        "May",
-        "June",
-        "July",
-        "August",
-        "September",
-        "October",
-        "November",
-        "December"
-    ];
+    function getCurrentDate() {
 
+        const now = new Date();
 
-    // ==========================================
-    // CURRENT MONTH
-    // ==========================================
-
-    function setCurrentMonth() {
-
-        const currentMonth =
-            new Date().getMonth() + 1;
-
-        saleMonth.value =
-            String(currentMonth);
+        return {
+            year: now.getFullYear(),
+            month: now.getMonth() + 1,
+            day: now.getDate()
+        };
 
     }
 
@@ -182,100 +210,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // NUMBER OF DAYS IN MONTH
     // ==========================================
 
-    function getDaysInMonth(month, year) {
+    function getDaysInMonth(
+        year,
+        month
+    ) {
 
         return new Date(
             year,
             month,
             0
         ).getDate();
-
-    }
-
-
-    // ==========================================
-    // UPDATE DAY LIMIT
-    // ==========================================
-
-    function updateDayLimit() {
-
-        const month =
-            Number(saleMonth.value);
-
-        const year =
-            new Date().getFullYear();
-
-        const maxDays =
-            getDaysInMonth(month, year);
-
-        saleDay.max =
-            String(maxDays);
-
-        if (
-            saleDay.value !== "" &&
-            Number(saleDay.value) > maxDays
-        ) {
-
-            saleDay.value =
-                maxDays;
-
-        }
-
-    }
-
-
-    // ==========================================
-    // INITIAL MONTH
-    // ==========================================
-
-    setCurrentMonth();
-
-    updateDayLimit();
-
-
-    saleMonth.addEventListener(
-        "change",
-        function () {
-
-            updateDayLimit();
-
-            updateSelectedDayTotal();
-
-        }
-    );
-
-
-    saleDay.addEventListener(
-        "input",
-        function () {
-
-            updateSelectedDayTotal();
-
-        }
-    );
-
-
-    // ==========================================
-    // TODAY DATE
-    // ==========================================
-
-    function getCurrentDateInfo() {
-
-        const now =
-            new Date();
-
-        return {
-
-            year:
-                now.getFullYear(),
-
-            month:
-                now.getMonth() + 1,
-
-            day:
-                now.getDate()
-
-        };
 
     }
 
@@ -320,13 +264,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // MONEY
+    // GET CUSTOMER
     // ==========================================
 
-    function money(value) {
+    function getSelectedCustomer() {
 
-        return Number(value || 0)
-            .toFixed(2);
+        return customers.find(function (customer) {
+
+            return String(customer.id) ===
+                String(selectedCustomerId);
+
+        });
 
     }
 
@@ -358,7 +306,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
         customerList.innerHTML = "";
 
-
         if (customers.length === 0) {
 
             customerList.innerHTML =
@@ -374,6 +321,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const button =
                 document.createElement("button");
+
+            button.type = "button";
 
             button.className =
                 "customer-button";
@@ -398,10 +347,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // ADD CUSTOMER BUTTON
+    // ADD CUSTOMER
     // ==========================================
 
-    addCustomer.addEventListener(
+    addCustomerButton.addEventListener(
         "click",
         function () {
 
@@ -423,7 +372,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // SAVE CUSTOMER
     // ==========================================
 
-    saveCustomer.addEventListener(
+    saveCustomerButton.addEventListener(
         "click",
         function () {
 
@@ -434,7 +383,7 @@ document.addEventListener("DOMContentLoaded", function () {
             if (name === "") {
 
                 alert(
-                    "Please enter customer name."
+                    "Please enter a customer name."
                 );
 
                 return;
@@ -449,11 +398,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 name:
                     name,
 
-                sales:
-                    [],
+                month:
+                    null,
 
                 prices:
-                    {}
+                    {},
+
+                sales:
+                    []
 
             };
 
@@ -469,10 +421,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // CANCEL CUSTOMER
+    // CANCEL ADD CUSTOMER
     // ==========================================
 
-    cancelCustomer.addEventListener(
+    cancelCustomerButton.addEventListener(
         "click",
         function () {
 
@@ -497,37 +449,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         customerMenu.classList.remove("hidden");
 
-        setCurrentMonth();
-
-        updateDayLimit();
-
-        saleDay.value = "";
-
-        productName.value = "";
-
-        productCost.value = "";
-
-        productQuantity.value = "";
-
         renderCustomer();
-
-    }
-
-
-    // ==========================================
-    // GET SELECTED CUSTOMER
-    // ==========================================
-
-    function getSelectedCustomer() {
-
-        return customers.find(
-            function (customer) {
-
-                return String(customer.id) ===
-                    String(selectedCustomerId);
-
-            }
-        );
 
     }
 
@@ -557,13 +479,120 @@ document.addEventListener("DOMContentLoaded", function () {
             customer.name;
 
 
-        updateProductSuggestions(customer);
+        // --------------------------------------
+        // RESTORE SAVED MONTH
+        // --------------------------------------
 
-        updateSelectedDayTotal();
+        if (
+            customer.month !== null &&
+            customer.month >= 1 &&
+            customer.month <= 12
+        ) {
 
-        calculateAllDaysTotal(customer);
+            saleMonth.value =
+                String(customer.month);
 
-        renderSalesTable(customer);
+        } else {
+
+            // First time: current month
+
+            const current =
+                getCurrentDate();
+
+            customer.month =
+                current.month;
+
+            saleMonth.value =
+                String(current.month);
+
+            saveData();
+
+        }
+
+
+        updateMonthInformation();
+
+        updateProductSuggestions();
+
+        updateTotals();
+
+        renderSalesTable();
+
+    }
+
+
+    // ==========================================
+    // MONTH SELECTED
+    // ==========================================
+
+    saleMonth.addEventListener(
+        "change",
+        function () {
+
+            const customer =
+                getSelectedCustomer();
+
+
+            if (!customer) {
+                return;
+            }
+
+
+            customer.month =
+                Number(saleMonth.value);
+
+
+            saveData();
+
+            updateMonthInformation();
+
+            updateTotals();
+
+            renderSalesTable();
+
+        }
+    );
+
+
+    // ==========================================
+    // MONTH INFORMATION
+    // ==========================================
+
+    function updateMonthInformation() {
+
+        const customer =
+            getSelectedCustomer();
+
+
+        if (!customer) {
+            return;
+        }
+
+
+        const month =
+            Number(customer.month);
+
+
+        const current =
+            getCurrentDate();
+
+
+        const days =
+            getDaysInMonth(
+                current.year,
+                month
+            );
+
+
+        monthMessage.textContent =
+            monthNames[month] +
+            " has " +
+            days +
+            " days.";
+
+
+        printMonthName.textContent =
+            monthNames[month];
 
     }
 
@@ -572,7 +601,16 @@ document.addEventListener("DOMContentLoaded", function () {
     // PRODUCT SUGGESTIONS
     // ==========================================
 
-    function updateProductSuggestions(customer) {
+    function updateProductSuggestions() {
+
+        const customer =
+            getSelectedCustomer();
+
+
+        if (!customer) {
+            return;
+        }
+
 
         productSuggestions.innerHTML = "";
 
@@ -580,13 +618,18 @@ document.addEventListener("DOMContentLoaded", function () {
         Object.keys(customer.prices)
             .forEach(function (key) {
 
+                const savedProduct =
+                    customer.prices[key];
+
                 const option =
                     document.createElement("option");
 
                 option.value =
-                    customer.prices[key].name;
+                    savedProduct.name;
 
-                productSuggestions.appendChild(option);
+                productSuggestions.appendChild(
+                    option
+                );
 
             });
 
@@ -594,7 +637,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // PRODUCT INPUT
+    // PRODUCT ENTERED
     // ==========================================
 
     productName.addEventListener(
@@ -610,18 +653,19 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
 
-            const name =
-                productName.value.trim()
+            const key =
+                productName.value
+                    .trim()
                     .toLowerCase();
 
 
             if (
-                name !== "" &&
-                customer.prices[name]
+                key !== "" &&
+                customer.prices[key]
             ) {
 
                 productCost.value =
-                    customer.prices[name].cost;
+                    customer.prices[key].cost;
 
             }
 
@@ -633,7 +677,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // ADD PRODUCT
     // ==========================================
 
-    addProduct.addEventListener(
+    addProductButton.addEventListener(
         "click",
         function () {
 
@@ -643,30 +687,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (!customer) {
 
-                alert("Customer not found.");
+                alert(
+                    "Customer not found."
+                );
 
                 return;
             }
 
 
+            // --------------------------------------
+            // CURRENT DATE
+            // --------------------------------------
+
+            const current =
+                getCurrentDate();
+
+
+            // --------------------------------------
+            // SELECTED MONTH
+            // --------------------------------------
+
+            const selectedMonth =
+                Number(customer.month);
+
+
+            // --------------------------------------
+            // PRODUCT
+            // --------------------------------------
+
             const name =
                 productName.value.trim();
+
+
+            // --------------------------------------
+            // COST
+            // --------------------------------------
 
             const cost =
                 Number(productCost.value);
 
+
+            // --------------------------------------
+            // QUANTITY
+            // --------------------------------------
+
             const quantity =
                 Number(productQuantity.value);
 
-            const month =
-                Number(saleMonth.value);
-
-            const day =
-                Number(saleDay.value);
-
 
             // --------------------------------------
-            // PRODUCT VALIDATION
+            // VALIDATION
             // --------------------------------------
 
             if (name === "") {
@@ -678,10 +748,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
-            // --------------------------------------
-            // COST VALIDATION
-            // --------------------------------------
 
             if (
                 productCost.value === "" ||
@@ -696,10 +762,6 @@ document.addEventListener("DOMContentLoaded", function () {
                 return;
             }
 
-
-            // --------------------------------------
-            // QUANTITY VALIDATION
-            // --------------------------------------
 
             if (
                 productQuantity.value === "" ||
@@ -716,17 +778,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // --------------------------------------
-            // MONTH VALIDATION
+            // MAKE SURE CURRENT DAY BELONGS TO
+            // SELECTED MONTH
             // --------------------------------------
 
             if (
-                !Number.isInteger(month) ||
-                month < 1 ||
-                month > 12
+                current.month !== selectedMonth
             ) {
 
                 alert(
-                    "Please select a valid month."
+                    "The selected month is " +
+                    monthNames[selectedMonth] +
+                    ", but today is " +
+                    monthNames[current.month] +
+                    ". Select the current month to add today's sale."
                 );
 
                 return;
@@ -734,48 +799,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // --------------------------------------
-            // DAY VALIDATION
-            // --------------------------------------
-
-            const year =
-                new Date().getFullYear();
-
-            const maxDays =
-                getDaysInMonth(
-                    month,
-                    year
-                );
-
-
-            if (
-                !Number.isInteger(day) ||
-                day < 1 ||
-                day > maxDays
-            ) {
-
-                alert(
-                    "Please enter a valid day for " +
-                    monthNames[month] +
-                    ". This month has " +
-                    maxDays +
-                    " days."
-                );
-
-                return;
-            }
-
-
-            // --------------------------------------
-            // PRODUCT PRICE MEMORY
+            // SAVE PRODUCT COST
             //
-            // USER CONTROLS THIS.
-            //
-            // If product is new:
-            // save entered cost.
-            //
-            // If product already exists:
-            // entered cost becomes the new saved
-            // cost because the USER entered it.
+            // The USER controls this.
+            // If they enter a different cost,
+            // that becomes the new saved cost.
             // --------------------------------------
 
             const productKey =
@@ -794,7 +822,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // --------------------------------------
-            // CALCULATE TOTAL
+            // PRODUCT TOTAL
             // --------------------------------------
 
             const total =
@@ -808,19 +836,19 @@ document.addEventListener("DOMContentLoaded", function () {
             customer.sales.push({
 
                 year:
-                    year,
+                    current.year,
 
                 month:
-                    month,
+                    current.month,
 
                 day:
-                    day,
+                    current.day,
 
                 dateKey:
                     makeDateKey(
-                        year,
-                        month,
-                        day
+                        current.year,
+                        current.month,
+                        current.day
                     ),
 
                 product:
@@ -839,14 +867,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
             // --------------------------------------
-            // SAVE PERMANENTLY
+            // SAVE
             // --------------------------------------
 
             saveData();
 
 
             // --------------------------------------
-            // CLEAR PRODUCT INPUT
+            // CLEAR ONLY PRODUCT INPUTS
+            //
+            // MONTH STAYS SELECTED.
             // --------------------------------------
 
             productName.value = "";
@@ -856,14 +886,14 @@ document.addEventListener("DOMContentLoaded", function () {
             productQuantity.value = "";
 
             productMessage.textContent =
-                "Product saved successfully.";
+                "Product added successfully.";
 
 
-            // --------------------------------------
-            // REFRESH DISPLAY
-            // --------------------------------------
+            updateProductSuggestions();
 
-            renderCustomer();
+            updateTotals();
+
+            renderSalesTable();
 
             productName.focus();
 
@@ -872,10 +902,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // SELECTED DAY TOTAL
+    // TOTALS
     // ==========================================
 
-    function updateSelectedDayTotal() {
+    function updateTotals() {
 
         const customer =
             getSelectedCustomer();
@@ -886,43 +916,41 @@ document.addEventListener("DOMContentLoaded", function () {
             daySales.textContent =
                 "0.00";
 
-            return;
-        }
-
-
-        const month =
-            Number(saleMonth.value);
-
-        const day =
-            Number(saleDay.value);
-
-
-        if (
-            !Number.isInteger(month) ||
-            !Number.isInteger(day) ||
-            day < 1
-        ) {
-
-            daySales.textContent =
+            allDaysSales.textContent =
                 "0.00";
 
             return;
         }
 
 
-        let total = 0;
+        const current =
+            getCurrentDate();
+
+
+        let todayTotal = 0;
+
+        let allDaysTotal = 0;
 
 
         customer.sales.forEach(
             function (sale) {
 
+                const saleTotal =
+                    Number(sale.total) || 0;
+
+
+                allDaysTotal +=
+                    saleTotal;
+
+
                 if (
-                    Number(sale.month) === month &&
-                    Number(sale.day) === day
+                    sale.year === current.year &&
+                    sale.month === current.month &&
+                    sale.day === current.day
                 ) {
 
-                    total +=
-                        Number(sale.total) || 0;
+                    todayTotal +=
+                        saleTotal;
 
                 }
 
@@ -931,32 +959,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
         daySales.textContent =
-            money(total);
-
-    }
-
-
-    // ==========================================
-    // ALL DAYS TOTAL
-    // ==========================================
-
-    function calculateAllDaysTotal(customer) {
-
-        let total = 0;
-
-
-        customer.sales.forEach(
-            function (sale) {
-
-                total +=
-                    Number(sale.total) || 0;
-
-            }
-        );
-
+            money(todayTotal);
 
         allDaysSales.textContent =
-            money(total);
+            money(allDaysTotal);
 
     }
 
@@ -970,19 +976,11 @@ document.addEventListener("DOMContentLoaded", function () {
         return sales.slice().sort(
             function (a, b) {
 
-                const dateA =
-                    a.dateKey || "";
-
-                const dateB =
-                    b.dateKey || "";
-
-                if (dateA !== dateB) {
-
-                    return dateA.localeCompare(dateB);
-
-                }
-
-                return 0;
+                return (
+                    a.dateKey.localeCompare(
+                        b.dateKey
+                    )
+                );
 
             }
         );
@@ -992,22 +990,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ==========================================
     // SALES TABLE
-    //
-    // UNLIMITED PRODUCTS
-    //
-    // Three products are shown per table row.
-    // This is NOT a product limit.
     // ==========================================
 
-    function renderSalesTable(customer) {
+    function renderSalesTable() {
 
-        salesTableContainer.innerHTML = "";
+        const customer =
+            getSelectedCustomer();
 
 
-        if (
-            !customer.sales ||
-            customer.sales.length === 0
-        ) {
-
-            salesTableContainer.innerHTML =
-       
+        
