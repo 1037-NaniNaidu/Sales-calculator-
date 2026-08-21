@@ -904,14 +904,6 @@ document.addEventListener("DOMContentLoaded", function () {
 //recycleBin.addEventListener("click", function () {
 //    alert("Recycle Bin is working!");
 });
-
-    // ==========================================
-    // START APP
-    // ==========================================
-
-    displayCustomers();
-
-});
 // ==========================================
 // AUTOMATIC NEW DAY REFRESH
 // ==========================================
@@ -940,8 +932,10 @@ function scheduleMidnightRefresh() {
 }
 
 scheduleMidnightRefresh();
+    // ==========================================
+    // START APP
+    // ==========================================
 
+    displayCustomers();
 
-        
-
-         
+});
