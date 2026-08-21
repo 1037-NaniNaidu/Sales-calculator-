@@ -910,6 +910,34 @@ document.addEventListener("DOMContentLoaded", function () {
     displayCustomers();
 
 });
+// ==========================================
+// AUTOMATIC NEW DAY REFRESH
+// ==========================================
+
+function scheduleMidnightRefresh() {
+
+    const now = new Date();
+
+    const tomorrow = new Date(now);
+
+    tomorrow.setDate(now.getDate() + 1);
+    tomorrow.setHours(0, 0, 1, 0);
+
+    const timeUntilMidnight =
+        tomorrow.getTime() - now.getTime();
+
+    setTimeout(function () {
+
+        if (selectedCustomerId !== null) {
+            updateCustomerMenu();
+        }
+
+        scheduleMidnightRefresh();
+
+    }, timeUntilMidnight);
+}
+
+scheduleMidnightRefresh();
 
 
         
