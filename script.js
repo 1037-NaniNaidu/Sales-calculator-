@@ -1,4 +1,5 @@
 alert("SCRIPT.JS IS LOADING");
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // ==========================================
@@ -248,8 +249,7 @@ document.addEventListener("DOMContentLoaded", function () {
             customers.find(
                 function (item) {
 
-                    return item.id ===
-                        customerId;
+                    return item.id === customerId;
                 }
             );
 
@@ -257,7 +257,6 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        // Make sure old data does not break
         if (!Array.isArray(customer.products)) {
             customer.products = [];
         }
@@ -918,6 +917,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 dayDiv.className = "day";
 
-                let html = `
+                const heading =
+                    document.createElement("h3");
+
+  
 
                   
