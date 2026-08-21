@@ -2,11 +2,17 @@ alert("SCRIPT.JS WORKING");
 
 document.addEventListener("DOMContentLoaded", function () {
 
-    const addCustomerButton =
-        document.getElementById("addCustomer");
+    const button = document.getElementById("addCustomer");
 
-    addCustomerButton.addEventListener("click", function () {
-        alert("ADD CUSTOMER WORKING");
-    });
+    if (button) {
+        alert("BUTTON FOUND");
+
+        button.onclick = function () {
+            alert("ADD CUSTOMER WORKING");
+        };
+
+    } else {
+        alert("BUTTON NOT FOUND");
+    }
 
 });
