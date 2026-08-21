@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     let customers =
         JSON.parse(localStorage.getItem("storeCustomers")) || [];
-        let deletedCustomers = [];
+    
     let selectedCustomerId = null;
 
 
