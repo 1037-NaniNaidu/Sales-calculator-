@@ -25,8 +25,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const addCustomerButton =
         document.getElementById("addCustomer");
-         const recycleBin =
-    document.getElementById("recycleBin");
+         
     const backToCustomers =
         document.getElementById("backToCustomers");
 
