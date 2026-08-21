@@ -1,28 +1,11 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    alert("JavaScript is working!");
+    alert("TEST STARTED");
 
-    const buttons = document.querySelectorAll("button");
+    alert("Page HTML length: " + document.documentElement.outerHTML.length);
 
-    let found = false;
-
-    buttons.forEach(function (button) {
-
-        if (button.textContent.trim() === "Add Product") {
-
-            found = true;
-
-            button.addEventListener("click", function () {
-                alert("ADD PRODUCT BUTTON FOUND AND WORKING!");
-            });
-
-        }
-
-    });
-
-    if (!found) {
-        alert("ADD PRODUCT BUTTON STILL NOT FOUND!");
-    }
+    alert("Add Product exists: " +
+        (document.getElementById("addProduct") !== null));
 
 });
 
