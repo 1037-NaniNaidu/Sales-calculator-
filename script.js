@@ -903,7 +903,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 //recycleBin.addEventListener("click", function () {
 //    alert("Recycle Bin is working!");
-});
+//});
 // ==========================================
 // AUTOMATIC NEW DAY REFRESH
 // ==========================================
