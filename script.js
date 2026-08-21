@@ -1,3 +1,4 @@
+alert("SCRIPT.JS IS WORKING");
 document.addEventListener("DOMContentLoaded", function () {
 
     // ==========================================
