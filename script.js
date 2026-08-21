@@ -25,7 +25,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const addCustomerButton =
         document.getElementById("addCustomer");
-
+         const recycleBin =
+    document.getElementById("recycleBin");
     const backToCustomers =
         document.getElementById("backToCustomers");
 
@@ -901,8 +902,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-recycleBin.addEventListener("click", function () {
-    alert("Recycle Bin is working!");
+//recycleBin.addEventListener("click", function () {
+//    alert("Recycle Bin is working!");
 });
 
     // ==========================================
