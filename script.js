@@ -1,11 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    alert("TEST STARTED");
+    const addCustomerButton = document.getElementById("addCustomer");
 
-    alert("Page HTML length: " + document.documentElement.outerHTML.length);
-
-    alert("Add Product exists: " +
-        (document.getElementById("addProduct") !== null));
+    if (addCustomerButton) {
+        addCustomerButton.addEventListener("click", function () {
+            alert("ADD CUSTOMER BUTTON FOUND AND WORKING!");
+        });
+    } else {
+        alert("ADD CUSTOMER BUTTON NOT FOUND!");
+    }
 
 });
 
