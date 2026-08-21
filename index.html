@@ -12,6 +12,7 @@
 
         body {
             margin: 0;
+            padding: 0;
             font-family: Arial, sans-serif;
             background: #eef3f8;
             color: #17212b;
@@ -30,13 +31,13 @@
         .card {
             background: white;
             padding: 16px;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
             border-radius: 12px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
 
         button {
-            border: none;
+            border: 0;
             border-radius: 8px;
             padding: 12px 16px;
             font-size: 16px;
@@ -54,19 +55,21 @@
         }
 
         .customer-button {
+            display: block;
             width: 100%;
-            text-align: left;
-            background: white;
-            border: 1px solid #ddd;
             margin-bottom: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            text-align: left;
         }
 
         input,
         select {
             width: 100%;
             padding: 12px;
-            margin: 6px 0 12px;
-            border: 1px solid #bbb;
+            margin-top: 6px;
+            margin-bottom: 14px;
+            border: 1px solid #aaa;
             border-radius: 8px;
             font-size: 16px;
             background: white;
@@ -90,9 +93,9 @@
         }
 
         .total-box {
-            font-size: 20px;
+            font-size: 21px;
             font-weight: bold;
-            margin: 10px 0;
+            margin-bottom: 14px;
         }
 
         .message {
@@ -106,16 +109,16 @@
         }
 
         table {
-            border-collapse: collapse;
             width: 100%;
-            min-width: 900px;
+            min-width: 1000px;
+            border-collapse: collapse;
             background: white;
         }
 
         th,
         td {
             border: 1px solid #999;
-            padding: 9px;
+            padding: 8px;
             text-align: center;
             white-space: nowrap;
         }
@@ -156,7 +159,6 @@
 
             .card {
                 box-shadow: none;
-                padding: 5px;
             }
 
             .table-container {
@@ -165,7 +167,7 @@
 
             table {
                 min-width: 0;
-                font-size: 10px;
+                font-size: 9px;
             }
         }
     </style>
@@ -175,15 +177,19 @@
 
 <main class="app">
 
-    <!-- ==============================
-         CUSTOMER LIST
-         ============================== -->
+    <!-- ==========================
+         MAIN SCREEN
+         ========================== -->
 
     <section id="customerScreen">
 
         <h1>Store Sales Manager</h1>
 
-        <button id="addCustomer" class="primary no-print">
+        <button
+            id="addCustomer"
+            class="primary no-print"
+            type="button"
+        >
             + Add Customer
         </button>
 
@@ -194,29 +200,44 @@
     </section>
 
 
-    <!-- ==============================
+    <!-- ==========================
          ADD CUSTOMER
-         ============================== -->
+         ========================== -->
 
-    <section id="customerForm" class="hidden">
+    <section
+        id="customerForm"
+        class="hidden"
+    >
 
         <div class="card">
 
             <h2>Add Customer</h2>
 
+            <label for="newCustomerName">
+                Customer Name
+            </label>
+
             <input
                 id="newCustomerName"
                 type="text"
-                placeholder="Customer name"
+                placeholder="Enter customer name"
             >
 
             <div class="row">
 
-                <button id="saveCustomer" class="primary">
+                <button
+                    id="saveCustomer"
+                    class="primary"
+                    type="button"
+                >
                     Save
                 </button>
 
-                <button id="cancelCustomer" class="secondary">
+                <button
+                    id="cancelCustomer"
+                    class="secondary"
+                    type="button"
+                >
                     Cancel
                 </button>
 
@@ -227,79 +248,48 @@
     </section>
 
 
-    <!-- ==============================
-         CUSTOMER SECTION
-         ============================== -->
+    <!-- ==========================
+         CUSTOMER MENU
+         ========================== -->
 
-    <section id="customerMenu" class="hidden">
+    <section
+        id="customerMenu"
+        class="hidden"
+    >
 
         <button
             id="backButton"
             class="secondary no-print"
+            type="button"
         >
             ← Back
         </button>
 
         <br><br>
 
+
+        <!-- PRINT TITLE -->
+
         <div class="print-title">
+
             <h1 id="printCustomerName"></h1>
-            <h3>All-Days Sales</h3>
+
+            <h3 id="printMonthName"></h3>
+
+            <p>All-Days Sales</p>
+
         </div>
 
 
         <!-- ==========================
-             PRODUCT INPUT
+             CUSTOMER + MONTH
              ========================== -->
 
         <div class="card">
 
             <h2 id="customerName"></h2>
 
-            <h3>1. Add Product</h3>
-
-            <label for="productName">
-                Product
-            </label>
-
-            <input
-                id="productName"
-                type="text"
-                list="productSuggestions"
-                placeholder="Enter product name"
-                autocomplete="off"
-            >
-
-            <datalist id="productSuggestions"></datalist>
-
-
-            <label for="productCost">
-                Cost
-            </label>
-
-            <input
-                id="productCost"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="Cost"
-            >
-
-
-            <label for="productQuantity">
-                Quantity
-            </label>
-
-            <input
-                id="productQuantity"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="Quantity"
-            >
-
-
-            <!-- MONTH -->
+            <h3>Select Month</h3>
 
             <label for="saleMonth">
                 Month
@@ -322,25 +312,64 @@
 
             </select>
 
+            <div id="monthMessage"></div>
 
-            <!-- DAY -->
+        </div>
 
-            <label for="saleDay">
-                Day Number
+
+        <!-- ==========================
+             ADD PRODUCT
+             ========================== -->
+
+        <div class="card">
+
+            <h3>Add Product</h3>
+
+            <label for="productName">
+                Product
             </label>
 
             <input
-                id="saleDay"
+                id="productName"
+                type="text"
+                list="productSuggestions"
+                placeholder="Enter product"
+                autocomplete="off"
+            >
+
+            <datalist id="productSuggestions"></datalist>
+
+
+            <label for="productCost">
+                Cost
+            </label>
+
+            <input
+                id="productCost"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Enter cost"
+            >
+
+
+            <label for="productQuantity">
+                Quantity
+            </label>
+
+            <input
+                id="productQuantity"
                 type="number"
                 min="1"
-                max="31"
-                placeholder="Enter day number"
+                step="1"
+                placeholder="Enter quantity"
             >
 
 
             <button
                 id="addProduct"
                 class="primary no-print"
+                type="button"
             >
                 Add Product
             </button>
@@ -359,14 +388,14 @@
 
         <div class="card">
 
-            <h3>4. Total Sales of Selected Day</h3>
+            <h3>Total Sales of Today</h3>
 
             <div class="total-box">
                 ₹<span id="daySales">0.00</span>
             </div>
 
 
-            <h3>5. Total Sales of All Days</h3>
+            <h3>Total Sales of All Days</h3>
 
             <div class="total-box">
                 ₹<span id="allDaysSales">0.00</span>
@@ -384,6 +413,7 @@
             <button
                 id="printSales"
                 class="primary"
+                type="button"
             >
                 🖨 Print All-Days Sales
             </button>
@@ -407,6 +437,8 @@
 
 </main>
 
+
+<!-- VERY IMPORTANT -->
 <script src="script.js"></script>
 
 </body>
