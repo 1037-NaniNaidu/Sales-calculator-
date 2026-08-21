@@ -854,9 +854,64 @@ document.addEventListener("DOMContentLoaded", function () {
                 },
                 0
             );
-
-
-        printHTML += `
+                printHTML += `
                 <h2>Grand Total</h2>
+
+                <p>
+                    Total Items Sold: ${grandItems}
+                </p>
+
+                <p class="total">
+                    Total Sales: ₹${grandTotal.toFixed(2)}
+                </p>
+
+            </body>
+            </html>
+        `;
+
+        const printWindow = window.open("", "_blank");
+
+        if (!printWindow) {
+            alert("Please allow pop-ups to print sales details.");
+            return;
+        }
+
+        printWindow.document.open();
+        printWindow.document.write(printHTML);
+        printWindow.document.close();
+
+        printWindow.focus();
+
+        setTimeout(function () {
+            printWindow.print();
+        }, 500);
+    });
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
+
+    // ==========================================
+    // START APP
+    // ==========================================
+
+    displayCustomers();
+
+});
+
+
+        
 
          
