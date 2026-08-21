@@ -901,7 +901,9 @@ document.addEventListener("DOMContentLoaded", function () {
             .replace(/"/g, "&quot;")
             .replace(/'/g, "&#039;");
     }
-
+recycleBin.addEventListener("click", function () {
+    alert("Recycle Bin is working!");
+});
 
     // ==========================================
     // START APP
