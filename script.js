@@ -80,10 +80,26 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
 
     function saveCustomers() {
+
         localStorage.setItem(
             "storeCustomers",
             JSON.stringify(customers)
         );
+    }
+
+
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
 
@@ -95,15 +111,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const date = new Date();
 
-        const year = date.getFullYear();
+        const year =
+            date.getFullYear();
 
-        const month = String(
-            date.getMonth() + 1
-        ).padStart(2, "0");
+        const month =
+            String(date.getMonth() + 1)
+                .padStart(2, "0");
 
-        const day = String(
-            date.getDate()
-        ).padStart(2, "0");
+        const day =
+            String(date.getDate())
+                .padStart(2, "0");
 
         return `${year}-${month}-${day}`;
     }
@@ -114,11 +131,14 @@ document.addEventListener("DOMContentLoaded", function () {
         const date =
             new Date(dateString + "T00:00:00");
 
-        return date.toLocaleDateString("en-IN", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric"
-        });
+        return date.toLocaleDateString(
+            "en-IN",
+            {
+                day: "2-digit",
+                month: "short",
+                year: "numeric"
+            }
+        );
     }
 
 
@@ -127,6 +147,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
 
     function displayCustomers() {
+
+        if (!customerList) {
+            return;
+        }
 
         customerList.innerHTML = "";
 
@@ -151,6 +175,7 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener(
                 "click",
                 function () {
+
                     openCustomer(customer.id);
                 }
             );
@@ -164,49 +189,52 @@ document.addEventListener("DOMContentLoaded", function () {
     // ADD CUSTOMER
     // ==========================================
 
-    addCustomerButton.addEventListener(
-        "click",
-        function () {
+    if (addCustomerButton) {
 
-            const name =
-                prompt("Enter customer name:");
+        addCustomerButton.addEventListener(
+            "click",
+            function () {
 
-            if (!name) {
-                return;
+                const name =
+                    prompt("Enter customer name:");
+
+                if (name === null) {
+                    return;
+                }
+
+                const cleanName =
+                    name.trim();
+
+                if (cleanName === "") {
+
+                    alert(
+                        "Please enter a customer name."
+                    );
+
+                    return;
+                }
+
+                const customer = {
+
+                    id:
+                        Date.now().toString(),
+
+                    name:
+                        cleanName,
+
+                    products: [],
+
+                    sales: []
+                };
+
+                customers.push(customer);
+
+                saveCustomers();
+
+                displayCustomers();
             }
-
-            const cleanName =
-                name.trim();
-
-            if (cleanName === "") {
-
-                alert(
-                    "Please enter a customer name."
-                );
-
-                return;
-            }
-
-            const customer = {
-
-                id:
-                    Date.now().toString(),
-
-                name:
-                    cleanName,
-
-                products: [],
-
-                sales: []
-            };
-
-            customers.push(customer);
-
-            saveCustomers();
-
-            displayCustomers();
-        }
-    );
+        );
+    }
 
 
     // ==========================================
@@ -218,7 +246,9 @@ document.addEventListener("DOMContentLoaded", function () {
         const customer =
             customers.find(
                 function (item) {
-                    return item.id === customerId;
+
+                    return item.id ===
+                        customerId;
                 }
             );
 
@@ -226,19 +256,37 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
+        // Make sure old data does not break
+        if (!Array.isArray(customer.products)) {
+            customer.products = [];
+        }
+
+        if (!Array.isArray(customer.sales)) {
+            customer.sales = [];
+        }
+
         selectedCustomerId =
             customerId;
 
-        customerScreen.classList.add(
-            "hidden"
-        );
+        if (customerScreen) {
 
-        customerMenu.classList.remove(
-            "hidden"
-        );
+            customerScreen.classList.add(
+                "hidden"
+            );
+        }
 
-        customerTitle.textContent =
-            "👤 " + customer.name;
+        if (customerMenu) {
+
+            customerMenu.classList.remove(
+                "hidden"
+            );
+        }
+
+        if (customerTitle) {
+
+            customerTitle.textContent =
+                "👤 " + customer.name;
+        }
 
         clearProductInputs();
 
@@ -250,23 +298,32 @@ document.addEventListener("DOMContentLoaded", function () {
     // BACK TO CUSTOMERS
     // ==========================================
 
-    backToCustomers.addEventListener(
-        "click",
-        function () {
+    if (backToCustomers) {
 
-            selectedCustomerId = null;
+        backToCustomers.addEventListener(
+            "click",
+            function () {
 
-            customerMenu.classList.add(
-                "hidden"
-            );
+                selectedCustomerId = null;
 
-            customerScreen.classList.remove(
-                "hidden"
-            );
+                if (customerMenu) {
 
-            displayCustomers();
-        }
-    );
+                    customerMenu.classList.add(
+                        "hidden"
+                    );
+                }
+
+                if (customerScreen) {
+
+                    customerScreen.classList.remove(
+                        "hidden"
+                    );
+                }
+
+                displayCustomers();
+            }
+        );
+    }
 
 
     // ==========================================
@@ -289,66 +346,69 @@ document.addEventListener("DOMContentLoaded", function () {
     // ADD PRODUCT
     // ==========================================
 
-    addProductButton.addEventListener(
-        "click",
-        function () {
+    if (addProductButton) {
 
-            const customer =
-                getSelectedCustomer();
+        addProductButton.addEventListener(
+            "click",
+            function () {
 
-            if (!customer) {
-                return;
+                const customer =
+                    getSelectedCustomer();
+
+                if (!customer) {
+                    return;
+                }
+
+                const name =
+                    productName.value.trim();
+
+                const price =
+                    Number(productPrice.value);
+
+                if (name === "") {
+
+                    alert(
+                        "Please enter the product name."
+                    );
+
+                    return;
+                }
+
+                if (
+                    productPrice.value === "" ||
+                    isNaN(price) ||
+                    price < 0
+                ) {
+
+                    alert(
+                        "Please enter a valid cost."
+                    );
+
+                    return;
+                }
+
+                const product = {
+
+                    id:
+                        Date.now().toString(),
+
+                    name:
+                        name,
+
+                    price:
+                        price
+                };
+
+                customer.products.push(product);
+
+                saveCustomers();
+
+                clearProductInputs();
+
+                updateCustomerMenu();
             }
-
-            const name =
-                productName.value.trim();
-
-            const price =
-                Number(productPrice.value);
-
-            if (name === "") {
-
-                alert(
-                    "Please enter the product name."
-                );
-
-                return;
-            }
-
-            if (
-                productPrice.value === "" ||
-                isNaN(price) ||
-                price < 0
-            ) {
-
-                alert(
-                    "Please enter a valid cost."
-                );
-
-                return;
-            }
-
-            const product = {
-
-                id:
-                    Date.now().toString(),
-
-                name:
-                    name,
-
-                price:
-                    price
-            };
-
-            customer.products.push(product);
-
-            saveCustomers();
-
-            clearProductInputs();
-
-            updateCustomerMenu();
-        }
-    );
+        );
+    }
 
 
     // ==========================================
@@ -357,9 +417,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function clearProductInputs() {
 
-        productName.value = "";
+        if (productName) {
+            productName.value = "";
+        }
 
-        productPrice.value = "";
+        if (productPrice) {
+            productPrice.value = "";
+        }
     }
 
 
@@ -368,6 +432,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
 
     function displayProducts(customer) {
+
+        if (!productList) {
+            return;
+        }
 
         productList.innerHTML = "";
 
@@ -392,7 +460,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         ${escapeHTML(product.name)}
                     </strong>
                     <br>
-                    ₹${product.price.toFixed(2)}
+                    ₹${Number(product.price).toFixed(2)}
                 `;
 
                 productList.appendChild(div);
@@ -406,6 +474,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
 
     function updateProductSelect(customer) {
+
+        if (!saleProduct) {
+            return;
+        }
 
         saleProduct.innerHTML =
             '<option value="">Select Product</option>';
@@ -422,34 +494,50 @@ document.addEventListener("DOMContentLoaded", function () {
                 option.textContent =
                     product.name +
                     " - ₹" +
-                    product.price.toFixed(2);
+                    Number(product.price).toFixed(2);
 
                 saleProduct.appendChild(option);
             }
         );
 
-        selectedPrice.textContent =
-            "Price: ₹0.00";
+        if (selectedPrice) {
 
-        saleAmount.textContent =
-            "Sale Amount: ₹0.00";
+            selectedPrice.textContent =
+                "Price: ₹0.00";
+        }
+
+        if (saleAmount) {
+
+            saleAmount.textContent =
+                "Sale Amount: ₹0.00";
+        }
     }
 
 
     // ==========================================
-    // SALE AMOUNT
+    // SALE AMOUNT EVENTS
     // ==========================================
 
-    saleProduct.addEventListener(
-        "change",
-        updateSaleAmount
-    );
+    if (saleProduct) {
 
-    saleQuantity.addEventListener(
-        "input",
-        updateSaleAmount
-    );
+        saleProduct.addEventListener(
+            "change",
+            updateSaleAmount
+        );
+    }
 
+    if (saleQuantity) {
+
+        saleQuantity.addEventListener(
+            "input",
+            updateSaleAmount
+        );
+    }
+
+
+    // ==========================================
+    // UPDATE SALE AMOUNT
+    // ==========================================
 
     function updateSaleAmount() {
 
@@ -471,11 +559,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (!product) {
 
-            selectedPrice.textContent =
-                "Price: ₹0.00";
+            if (selectedPrice) {
 
-            saleAmount.textContent =
-                "Sale Amount: ₹0.00";
+                selectedPrice.textContent =
+                    "Price: ₹0.00";
+            }
+
+            if (saleAmount) {
+
+                saleAmount.textContent =
+                    "Sale Amount: ₹0.00";
+            }
 
             return;
         }
@@ -484,15 +578,21 @@ document.addEventListener("DOMContentLoaded", function () {
             Number(saleQuantity.value) || 0;
 
         const amount =
-            product.price * quantity;
+            Number(product.price) * quantity;
 
-        selectedPrice.textContent =
-            "Price: ₹" +
-            product.price.toFixed(2);
+        if (selectedPrice) {
 
-        saleAmount.textContent =
-            "Sale Amount: ₹" +
-            amount.toFixed(2);
+            selectedPrice.textContent =
+                "Price: ₹" +
+                Number(product.price).toFixed(2);
+        }
+
+        if (saleAmount) {
+
+            saleAmount.textContent =
+                "Sale Amount: ₹" +
+                amount.toFixed(2);
+        }
     }
 
 
@@ -500,100 +600,110 @@ document.addEventListener("DOMContentLoaded", function () {
     // ADD SALE
     // ==========================================
 
-    addSaleButton.addEventListener(
-        "click",
-        function () {
+    if (addSaleButton) {
 
-            const customer =
-                getSelectedCustomer();
+        addSaleButton.addEventListener(
+            "click",
+            function () {
 
-            if (!customer) {
-                return;
-            }
+                const customer =
+                    getSelectedCustomer();
 
-            const product =
-                customer.products.find(
-                    function (item) {
+                if (!customer) {
+                    return;
+                }
 
-                        return item.id ===
-                            saleProduct.value;
-                    }
-                );
+                const product =
+                    customer.products.find(
+                        function (item) {
 
-            if (!product) {
-
-                alert(
-                    "Please select a product."
-                );
-
-                return;
-            }
-
-            const quantity =
-                Number(saleQuantity.value);
-
-            if (
-                !Number.isInteger(quantity) ||
-                quantity <= 0
-            ) {
-
-                alert(
-                    "Please enter a valid quantity."
-                );
-
-                return;
-            }
-
-            const amount =
-                product.price * quantity;
-
-            const sale = {
-
-                id:
-                    Date.now().toString(),
-
-                date:
-                    getToday(),
-
-                productName:
-                    product.name,
-
-                price:
-                    product.price,
-
-                quantity:
-                    quantity,
-
-                amount:
-                    amount,
-
-                time:
-                    new Date().toLocaleTimeString(
-                        "en-IN",
-                        {
-                            hour: "2-digit",
-                            minute: "2-digit"
+                            return item.id ===
+                                saleProduct.value;
                         }
-                    )
-            };
+                    );
 
-            customer.sales.push(sale);
+                if (!product) {
 
-            saveCustomers();
+                    alert(
+                        "Please select a product."
+                    );
 
-            saleProduct.value = "";
+                    return;
+                }
 
-            saleQuantity.value = "";
+                const quantity =
+                    Number(saleQuantity.value);
 
-            selectedPrice.textContent =
-                "Price: ₹0.00";
+                if (
+                    !Number.isInteger(quantity) ||
+                    quantity <= 0
+                ) {
 
-            saleAmount.textContent =
-                "Sale Amount: ₹0.00";
+                    alert(
+                        "Please enter a valid quantity."
+                    );
 
-            updateCustomerMenu();
-        }
-    );
+                    return;
+                }
+
+                const amount =
+                    Number(product.price) *
+                    quantity;
+
+                const sale = {
+
+                    id:
+                        Date.now().toString(),
+
+                    date:
+                        getToday(),
+
+                    productName:
+                        product.name,
+
+                    price:
+                        Number(product.price),
+
+                    quantity:
+                        quantity,
+
+                    amount:
+                        amount,
+
+                    time:
+                        new Date().toLocaleTimeString(
+                            "en-IN",
+                            {
+                                hour: "2-digit",
+                                minute: "2-digit"
+                            }
+                        )
+                };
+
+                customer.sales.push(sale);
+
+                saveCustomers();
+
+                saleProduct.value = "";
+
+                saleQuantity.value = "";
+
+                if (selectedPrice) {
+
+                    selectedPrice.textContent =
+                        "Price: ₹0.00";
+                }
+
+                if (saleAmount) {
+
+                    saleAmount.textContent =
+                        "Sale Amount: ₹0.00";
+                }
+
+                updateCustomerMenu();
+            }
+        );
+    }
 
 
     // ==========================================
@@ -609,9 +719,12 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        currentDay.textContent =
-            "Today: " +
-            getReadableDate(getToday());
+        if (currentDay) {
+
+            currentDay.textContent =
+                "Today: " +
+                getReadableDate(getToday());
+        }
 
         displayProducts(customer);
 
@@ -631,6 +744,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function displayDaySales(customer) {
 
+        if (!daySales) {
+            return;
+        }
+
         const today =
             getToday();
 
@@ -646,7 +763,8 @@ document.addEventListener("DOMContentLoaded", function () {
             todaySales.reduce(
                 function (sum, sale) {
 
-                    return sum + sale.amount;
+                    return sum +
+                        Number(sale.amount || 0);
 
                 },
                 0
@@ -656,7 +774,8 @@ document.addEventListener("DOMContentLoaded", function () {
             todaySales.reduce(
                 function (sum, sale) {
 
-                    return sum + sale.quantity;
+                    return sum +
+                        Number(sale.quantity || 0);
 
                 },
                 0
@@ -684,11 +803,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function displayTotalSales(customer) {
 
+        if (!totalSales) {
+            return;
+        }
+
         const total =
             customer.sales.reduce(
                 function (sum, sale) {
 
-                    return sum + sale.amount;
+                    return sum +
+                        Number(sale.amount || 0);
 
                 },
                 0
@@ -698,7 +822,8 @@ document.addEventListener("DOMContentLoaded", function () {
             customer.sales.reduce(
                 function (sum, sale) {
 
-                    return sum + sale.quantity;
+                    return sum +
+                        Number(sale.quantity || 0);
 
                 },
                 0
@@ -725,6 +850,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // ==========================================
 
     function displaySalesHistory(customer) {
+
+        if (!salesHistory) {
+            return;
+        }
 
         salesHistory.innerHTML = "";
 
@@ -766,7 +895,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         function (sum, sale) {
 
                             return sum +
-                                sale.amount;
+                                Number(sale.amount || 0);
 
                         },
                         0
@@ -777,7 +906,7 @@ document.addEventListener("DOMContentLoaded", function () {
                         function (sum, sale) {
 
                             return sum +
-                                sale.quantity;
+                                Number(sale.quantity || 0);
 
                         },
                         0
@@ -790,135 +919,4 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 let html = `
 
-                    <div class="day-title">
-                        📅
-                        ${getReadableDate(date)}
-                    </div>
-
-                    <div>
-                        Items: ${items}
-                    </div>
-
-                    <div class="daily-total">
-                        Day Total:
-                        ₹${total.toFixed(2)}
-                    </div>
-
-                    <hr>
-
-                `;
-
-                salesForDay.forEach(
-                    function (sale) {
-
-                        html += `
-
-                            <div class="summary-row">
-
-                                ${escapeHTML(
-                                    sale.productName
-                                )}
-
-                                × ${sale.quantity}
-
-                                =
-                                ₹${sale.amount.toFixed(2)}
-
-                                <br>
-
-                                <small>
-                                    ${escapeHTML(
-                                        sale.time
-                                    )}
-                                </small>
-
-                            </div>
-
-                        `;
-                    }
-                );
-
-                dayDiv.innerHTML =
-                    html;
-
-                salesHistory.appendChild(
-                    dayDiv
-                );
-            }
-        );
-    }
-
-
-    // ==========================================
-    // PRINT SALES
-    // ==========================================
-
-    printSales.addEventListener(
-        "click",
-        function () {
-
-            const customer =
-                getSelectedCustomer();
-
-            if (!customer) {
-                return;
-            }
-
-            if (customer.sales.length === 0) {
-
-                alert(
-                    "There are no sales to print."
-                );
-
-                return;
-            }
-
-            const grouped = {};
-
-            customer.sales.forEach(
-                function (sale) {
-
-                    if (!grouped[sale.date]) {
-
-                        grouped[sale.date] = [];
-                    }
-
-                    grouped[sale.date].push(
-                        sale
-                    );
-                }
-            );
-
-            const dates =
-                Object.keys(grouped)
-                    .sort()
-                    .reverse();
-
-            let printHTML = `
-
-                <!DOCTYPE html>
-
-                <html>
-
-                <head>
-
-                    <title>
-                        Sales -
-                        ${escapeHTML(customer.name)}
-                    </title>
-
-                    <style>
-
-                        body {
-                            font-family: Arial, sans-serif;
-                            padding: 25px;
-                            color: #111;
-                        }
-
-                        h1 {
-                            margin-bottom: 5px;
-                        }
-
-                        h2 {
-                            margin-top: 25px;
-                            border-bottom: 1px soli
+                  
