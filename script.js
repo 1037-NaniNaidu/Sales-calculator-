@@ -1,37 +1,19 @@
-alert("SCRIPT.JS IS LOADING");
+alert("SCRIPT.JS IS WORKING");
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    // ==========================================
-    // DATA
-    // ==========================================
-
-    let customers =
-        JSON.parse(localStorage.getItem("storeCustomers")) || [];
-
-    let selectedCustomerId = null;
-
-
-    // ==========================================
-    // ELEMENTS
-    // ==========================================
-
-    const customerScreen =
-        document.getElementById("customerScreen");
-
-    const customerMenu =
-        document.getElementById("customerMenu");
-
-    const customerList =
-        document.getElementById("customerList");
 
     const addCustomerButton =
         document.getElementById("addCustomer");
 
-    const backToCustomers =
-        document.getElementById("backToCustomers");
+    if (!addCustomerButton) {
+        alert("ADD CUSTOMER BUTTON NOT FOUND");
+        return;
+    }
 
-    const customerTitle =
-        document.getElementById("customerTitle");
+    addCustomerButton.addEventListener("click", function () {
 
-                          
+        alert("ADD CUSTOMER BUTTON IS WORKING");
+
+    });
+
+});
