@@ -1,17 +1,21 @@
-alert("SCRIPT.JS WORKING");
+window.onload = function () {
 
-const button = document.getElementById("addCustomer");
+    alert("PAGE LOADED");
 
-if (button) {
+    const button = document.getElementById("addCustomer");
 
-    alert("BUTTON FOUND");
+    if (button) {
 
-    button.onclick = function () {
-        alert("ADD CUSTOMER WORKING");
-    };
+        alert("BUTTON FOUND");
 
-} else {
+        button.onclick = function () {
+            alert("ADD CUSTOMER WORKING");
+        };
 
-    alert("BUTTON NOT FOUND");
+    } else {
 
-}
+        alert("BUTTON NOT FOUND");
+
+    }
+
+};
