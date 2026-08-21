@@ -996,6 +996,240 @@ document.addEventListener("DOMContentLoaded", function () {
 
         const customer =
             getSelectedCustomer();
+                if (!customer) {
+            salesTableContainer.innerHTML =
+                '<div class="empty">No customer selected.</div>';
+            return;
+        }
+
+        const selectedMonth =
+            Number(customer.month);
+
+        const selectedYear =
+            getCurrentDate().year;
+
+        // --------------------------------------
+        // FILTER SALES FOR SELECTED MONTH
+        // --------------------------------------
+
+        const monthSales =
+            customer.sales.filter(function (sale) {
+
+                return (
+                    Number(sale.year) === selectedYear &&
+                    Number(sale.month) === selectedMonth
+                );
+
+            });
+
+        // --------------------------------------
+        // NO SALES
+        // --------------------------------------
+
+        if (monthSales.length === 0) {
+
+            salesTableContainer.innerHTML =
+                '<div class="empty">' +
+                'No sales recorded for ' +
+                monthNames[selectedMonth] +
+                ' yet.' +
+                '</div>';
+
+            return;
+        }
+
+        // --------------------------------------
+        // SORT SALES
+        // --------------------------------------
+
+        const sortedSales =
+            sortSales(monthSales);
+
+        // --------------------------------------
+        // CREATE TABLE
+        // --------------------------------------
+
+        let html = "";
+
+        html += '<div class="table-container">';
+
+        html += '<table>';
+
+        html += '<thead>';
+
+        html += '<tr>';
+
+        html += '<th>Date</th>';
+        html += '<th>Product</th>';
+        html += '<th>Cost</th>';
+        html += '<th>Quantity</th>';
+        html += '<th>Total</th>';
+
+        html += '</tr>';
+
+        html += '</thead>';
+
+        html += '<tbody>';
+
+        sortedSales.forEach(function (sale) {
+
+            html += '<tr>';
+
+            html += '<td>' +
+                displayDate(
+                    Number(sale.month),
+                    Number(sale.day)
+                ) +
+                '</td>';
+
+            html += '<td>' +
+                escapeHTML(sale.product) +
+                '</td>';
+
+            html += '<td>₹' +
+                money(sale.cost) +
+                '</td>';
+
+            html += '<td>' +
+                Number(sale.quantity) +
+                '</td>';
+
+            html += '<td>₹' +
+                money(sale.total) +
+                '</td>';
+
+            html += '</tr>';
+
+        });
+
+        html += '</tbody>';
+
+        html += '</table>';
+
+        html += '</div>';
+
+        salesTableContainer.innerHTML = html;
+
+    }
 
 
+    // ==========================================
+    // ESCAPE HTML
+    // ==========================================
+
+    function escapeHTML(value) {
+
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+
+    }
+
+
+    // ==========================================
+    // BACK BUTTON
+    // ==========================================
+
+    backButton.addEventListener(
+        "click",
+        function () {
+
+            showCustomerScreen();
+
+        }
+    );
+
+
+    // ==========================================
+    // PRINT SALES
+    // ==========================================
+
+    printSalesButton.addEventListener(
+        "click",
+        function () {
+
+            const customer =
+                getSelectedCustomer();
+
+            if (!customer) {
+                return;
+            }
+
+            printCustomerName.textContent =
+                customer.name;
+
+            printMonthName.textContent =
+                monthNames[
+                    Number(customer.month)
+                ];
+
+            window.print();
+
+        }
+    );
+
+
+    // ==========================================
+    // MIDNIGHT DATE UPDATE
+    // ==========================================
+
+    let lastDateKey = "";
+
+    function checkDateChange() {
+
+        const current =
+            getCurrentDate();
+
+        const todayKey =
+            makeDateKey(
+                current.year,
+                current.month,
+                current.day
+            );
+
+        if (lastDateKey === "") {
+
+            lastDateKey = todayKey;
+
+            return;
+        }
+
+        if (todayKey !== lastDateKey) {
+
+            lastDateKey = todayKey;
+
+            const customer =
+                getSelectedCustomer();
+
+            if (customer) {
+
+                updateTotals();
+                renderSalesTable();
+
+            }
+
+        }
+
+    }
+
+
+    // Check the date every minute
+    setInterval(
+        checkDateChange,
+        60000
+    );
+
+
+    // ==========================================
+    // START APPLICATION
+    // ==========================================
+
+    renderCustomers();
+
+});
+
+    
         
