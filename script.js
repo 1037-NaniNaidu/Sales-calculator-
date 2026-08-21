@@ -4,8 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // DATA
     // ==========================================
 
-    let customers =
-        JSON.parse(localStorage.getItem("storeCustomers")) || [];
+    let customers = loadCustomers();
 
     let selectedCustomerId = null;
 
@@ -50,6 +49,9 @@ document.addEventListener("DOMContentLoaded", function () {
     const customerName =
         document.getElementById("customerName");
 
+    const printCustomerName =
+        document.getElementById("printCustomerName");
+
     const productName =
         document.getElementById("productName");
 
@@ -59,6 +61,18 @@ document.addEventListener("DOMContentLoaded", function () {
     const productQuantity =
         document.getElementById("productQuantity");
 
+    const productSuggestions =
+        document.getElementById("productSuggestions");
+
+    const saleMonth =
+        document.getElementById("saleMonth");
+
+    const saleDay =
+        document.getElementById("saleDay");
+
+    const productMessage =
+        document.getElementById("productMessage");
+
     const daySales =
         document.getElementById("daySales");
 
@@ -67,6 +81,50 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const salesTableContainer =
         document.getElementById("salesTableContainer");
+
+
+    // ==========================================
+    // LOAD CUSTOMERS
+    // ==========================================
+
+    function loadCustomers() {
+
+        try {
+
+            const saved =
+                localStorage.getItem("storeCustomers");
+
+            if (!saved) {
+                return [];
+            }
+
+            const data =
+                JSON.parse(saved);
+
+            if (!Array.isArray(data)) {
+                return [];
+            }
+
+            return data.map(function (customer) {
+
+                if (!Array.isArray(customer.sales)) {
+                    customer.sales = [];
+                }
+
+                if (!customer.prices) {
+                    customer.prices = {};
+                }
+
+                return customer;
+
+            });
+
+        } catch (error) {
+
+            return [];
+
+        }
+    }
 
 
     // ==========================================
@@ -84,28 +142,196 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // TODAY'S DATE
+    // MONTH NAMES
     // ==========================================
 
-    function getToday() {
+    const monthNames = [
+        "",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December"
+    ];
 
-        const date = new Date();
 
-        const year =
-            date.getFullYear();
+    // ==========================================
+    // CURRENT MONTH
+    // ==========================================
 
-        const month =
-            String(date.getMonth() + 1).padStart(2, "0");
+    function setCurrentMonth() {
 
-        const day =
-            String(date.getDate()).padStart(2, "0");
+        const currentMonth =
+            new Date().getMonth() + 1;
 
-        return year + "-" + month + "-" + day;
+        saleMonth.value =
+            String(currentMonth);
+
     }
 
 
     // ==========================================
-    // SHOW CUSTOMER SCREEN
+    // NUMBER OF DAYS IN MONTH
+    // ==========================================
+
+    function getDaysInMonth(month, year) {
+
+        return new Date(
+            year,
+            month,
+            0
+        ).getDate();
+
+    }
+
+
+    // ==========================================
+    // UPDATE DAY LIMIT
+    // ==========================================
+
+    function updateDayLimit() {
+
+        const month =
+            Number(saleMonth.value);
+
+        const year =
+            new Date().getFullYear();
+
+        const maxDays =
+            getDaysInMonth(month, year);
+
+        saleDay.max =
+            String(maxDays);
+
+        if (
+            saleDay.value !== "" &&
+            Number(saleDay.value) > maxDays
+        ) {
+
+            saleDay.value =
+                maxDays;
+
+        }
+
+    }
+
+
+    // ==========================================
+    // INITIAL MONTH
+    // ==========================================
+
+    setCurrentMonth();
+
+    updateDayLimit();
+
+
+    saleMonth.addEventListener(
+        "change",
+        function () {
+
+            updateDayLimit();
+
+            updateSelectedDayTotal();
+
+        }
+    );
+
+
+    saleDay.addEventListener(
+        "input",
+        function () {
+
+            updateSelectedDayTotal();
+
+        }
+    );
+
+
+    // ==========================================
+    // TODAY DATE
+    // ==========================================
+
+    function getCurrentDateInfo() {
+
+        const now =
+            new Date();
+
+        return {
+
+            year:
+                now.getFullYear(),
+
+            month:
+                now.getMonth() + 1,
+
+            day:
+                now.getDate()
+
+        };
+
+    }
+
+
+    // ==========================================
+    // DATE KEY
+    // ==========================================
+
+    function makeDateKey(
+        year,
+        month,
+        day
+    ) {
+
+        return (
+            year +
+            "-" +
+            String(month).padStart(2, "0") +
+            "-" +
+            String(day).padStart(2, "0")
+        );
+
+    }
+
+
+    // ==========================================
+    // DISPLAY DATE
+    // ==========================================
+
+    function displayDate(
+        month,
+        day
+    ) {
+
+        return (
+            String(day).padStart(2, "0") +
+            "/" +
+            String(month).padStart(2, "0")
+        );
+
+    }
+
+
+    // ==========================================
+    // MONEY
+    // ==========================================
+
+    function money(value) {
+
+        return Number(value || 0)
+            .toFixed(2);
+
+    }
+
+
+    // ==========================================
+    // MAIN SCREEN
     // ==========================================
 
     function showCustomerScreen() {
@@ -124,36 +350,20 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // SHOW ADD CUSTOMER FORM
-    // ==========================================
-
-    function showCustomerForm() {
-
-        customerScreen.classList.add("hidden");
-
-        customerMenu.classList.add("hidden");
-
-        customerForm.classList.remove("hidden");
-
-        newCustomerName.value = "";
-
-        newCustomerName.focus();
-
-    }
-
-
-    // ==========================================
-    // RENDER CUSTOMERS
+    // CUSTOMER LIST
     // ==========================================
 
     function renderCustomers() {
 
         customerList.innerHTML = "";
 
+
         if (customers.length === 0) {
 
             customerList.innerHTML =
-                '<div class="card empty">No customers added yet.</div>';
+                '<div class="card empty">' +
+                'No customers added yet.' +
+                '</div>';
 
             return;
         }
@@ -173,7 +383,9 @@ document.addEventListener("DOMContentLoaded", function () {
             button.addEventListener(
                 "click",
                 function () {
+
                     openCustomer(customer.id);
+
                 }
             );
 
@@ -191,7 +403,17 @@ document.addEventListener("DOMContentLoaded", function () {
     addCustomer.addEventListener(
         "click",
         function () {
-            showCustomerForm();
+
+            customerScreen.classList.add("hidden");
+
+            customerMenu.classList.add("hidden");
+
+            customerForm.classList.remove("hidden");
+
+            newCustomerName.value = "";
+
+            newCustomerName.focus();
+
         }
     );
 
@@ -210,24 +432,32 @@ document.addEventListener("DOMContentLoaded", function () {
 
             if (name === "") {
 
-                alert("Please enter a customer name.");
+                alert(
+                    "Please enter customer name."
+                );
 
                 return;
             }
 
 
-            const newCustomer = {
+            const customer = {
 
-                id: Date.now(),
+                id:
+                    Date.now().toString(),
 
-                name: name,
+                name:
+                    name,
 
-                sales: []
+                sales:
+                    [],
+
+                prices:
+                    {}
 
             };
 
 
-            customers.push(newCustomer);
+            customers.push(customer);
 
             saveData();
 
@@ -244,7 +474,9 @@ document.addEventListener("DOMContentLoaded", function () {
     cancelCustomer.addEventListener(
         "click",
         function () {
+
             showCustomerScreen();
+
         }
     );
 
@@ -255,13 +487,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
     function openCustomer(id) {
 
-        selectedCustomerId = id;
+        selectedCustomerId =
+            String(id);
 
         customerScreen.classList.add("hidden");
 
         customerForm.classList.add("hidden");
 
         customerMenu.classList.remove("hidden");
+
+        setCurrentMonth();
+
+        updateDayLimit();
+
+        saleDay.value = "";
+
+        productName.value = "";
+
+        productCost.value = "";
+
+        productQuantity.value = "";
 
         renderCustomer();
 
@@ -276,7 +521,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
         return customers.find(
             function (customer) {
-                return customer.id === selectedCustomerId;
+
+                return String(customer.id) ===
+                    String(selectedCustomerId);
+
             }
         );
 
@@ -304,8 +552,15 @@ document.addEventListener("DOMContentLoaded", function () {
         customerName.textContent =
             customer.name;
 
+        printCustomerName.textContent =
+            customer.name;
 
-        calculateTotals(customer);
+
+        updateProductSuggestions(customer);
+
+        updateSelectedDayTotal();
+
+        calculateAllDaysTotal(customer);
 
         renderSalesTable(customer);
 
@@ -313,46 +568,64 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // ==========================================
-    // CALCULATE TOTALS
+    // PRODUCT SUGGESTIONS
     // ==========================================
 
-    function calculateTotals(customer) {
+    function updateProductSuggestions(customer) {
 
-        const today =
-            getToday();
-
-        let todayTotal = 0;
-
-        let allDaysTotal = 0;
+        productSuggestions.innerHTML = "";
 
 
-        customer.sales.forEach(
-            function (sale) {
+        Object.keys(customer.prices)
+            .forEach(function (key) {
 
-                const amount =
-                    Number(sale.total) || 0;
+                const option =
+                    document.createElement("option");
 
+                option.value =
+                    customer.prices[key].name;
 
-                allDaysTotal += amount;
+                productSuggestions.appendChild(option);
 
-
-                if (sale.date === today) {
-
-                    todayTotal += amount;
-
-                }
-
-            }
-        );
-
-
-        daySales.textContent =
-            todayTotal.toFixed(2);
-
-        allDaysSales.textContent =
-            allDaysTotal.toFixed(2);
+            });
 
     }
+
+
+    // ==========================================
+    // PRODUCT INPUT
+    // ==========================================
+
+    productName.addEventListener(
+        "input",
+        function () {
+
+            const customer =
+                getSelectedCustomer();
+
+
+            if (!customer) {
+                return;
+            }
+
+
+            const name =
+                productName.value.trim()
+                    .toLowerCase();
+
+
+            if (
+                name !== "" &&
+                customer.prices[name]
+            ) {
+
+                productCost.value =
+                    customer.prices[name].cost;
+
+            }
+
+        }
+    );
 
 
     // ==========================================
@@ -363,6 +636,18 @@ document.addEventListener("DOMContentLoaded", function () {
         "click",
         function () {
 
+            const customer =
+                getSelectedCustomer();
+
+
+            if (!customer) {
+
+                alert("Customer not found.");
+
+                return;
+            }
+
+
             const name =
                 productName.value.trim();
 
@@ -372,14 +657,30 @@ document.addEventListener("DOMContentLoaded", function () {
             const quantity =
                 Number(productQuantity.value);
 
+            const month =
+                Number(saleMonth.value);
+
+            const day =
+                Number(saleDay.value);
+
+
+            // --------------------------------------
+            // PRODUCT VALIDATION
+            // --------------------------------------
 
             if (name === "") {
 
-                alert("Please enter the product name.");
+                alert(
+                    "Please enter the product."
+                );
 
                 return;
             }
 
+
+            // --------------------------------------
+            // COST VALIDATION
+            // --------------------------------------
 
             if (
                 productCost.value === "" ||
@@ -387,11 +688,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 cost < 0
             ) {
 
-                alert("Please enter a valid cost.");
+                alert(
+                    "Please enter a valid cost."
+                );
 
                 return;
             }
 
+
+            // --------------------------------------
+            // QUANTITY VALIDATION
+            // --------------------------------------
 
             if (
                 productQuantity.value === "" ||
@@ -399,67 +706,296 @@ document.addEventListener("DOMContentLoaded", function () {
                 quantity <= 0
             ) {
 
-                alert("Please enter a valid quantity.");
+                alert(
+                    "Please enter a valid quantity."
+                );
 
                 return;
             }
 
 
-            const customer =
-                getSelectedCustomer();
+            // --------------------------------------
+            // MONTH VALIDATION
+            // --------------------------------------
 
+            if (
+                !Number.isInteger(month) ||
+                month < 1 ||
+                month > 12
+            ) {
 
-            if (!customer) {
-
-                alert("Customer not found.");
+                alert(
+                    "Please select a valid month."
+                );
 
                 return;
             }
 
 
-            // COST × QUANTITY
+            // --------------------------------------
+            // DAY VALIDATION
+            // --------------------------------------
+
+            const year =
+                new Date().getFullYear();
+
+            const maxDays =
+                getDaysInMonth(
+                    month,
+                    year
+                );
+
+
+            if (
+                !Number.isInteger(day) ||
+                day < 1 ||
+                day > maxDays
+            ) {
+
+                alert(
+                    "Please enter a valid day for " +
+                    monthNames[month] +
+                    ". This month has " +
+                    maxDays +
+                    " days."
+                );
+
+                return;
+            }
+
+
+            // --------------------------------------
+            // PRODUCT PRICE MEMORY
+            //
+            // USER CONTROLS THIS.
+            //
+            // If product is new:
+            // save entered cost.
+            //
+            // If product already exists:
+            // entered cost becomes the new saved
+            // cost because the USER entered it.
+            // --------------------------------------
+
+            const productKey =
+                name.toLowerCase();
+
+
+            customer.prices[productKey] = {
+
+                name:
+                    name,
+
+                cost:
+                    cost
+
+            };
+
+
+            // --------------------------------------
+            // CALCULATE TOTAL
+            // --------------------------------------
+
             const total =
                 cost * quantity;
 
 
+            // --------------------------------------
+            // SAVE SALE
+            // --------------------------------------
+
             customer.sales.push({
 
-                product: name,
+                year:
+                    year,
 
-                cost: cost,
+                month:
+                    month,
 
-                quantity: quantity,
+                day:
+                    day,
 
-                total: total,
+                dateKey:
+                    makeDateKey(
+                        year,
+                        month,
+                        day
+                    ),
 
-                date: getToday()
+                product:
+                    name,
+
+                cost:
+                    cost,
+
+                quantity:
+                    quantity,
+
+                total:
+                    total
 
             });
 
 
+            // --------------------------------------
+            // SAVE PERMANENTLY
+            // --------------------------------------
+
             saveData();
 
 
-            // CLEAR THE SAME INPUT AREA
+            // --------------------------------------
+            // CLEAR PRODUCT INPUT
+            // --------------------------------------
+
             productName.value = "";
 
             productCost.value = "";
 
             productQuantity.value = "";
 
+            productMessage.textContent =
+                "Product saved successfully.";
+
+
+            // --------------------------------------
+            // REFRESH DISPLAY
+            // --------------------------------------
+
+            renderCustomer();
 
             productName.focus();
-
-
-            // UPDATE TABLE AND TOTALS
-            renderCustomer();
 
         }
     );
 
 
     // ==========================================
-    // RENDER SALES TABLE
+    // SELECTED DAY TOTAL
+    // ==========================================
+
+    function updateSelectedDayTotal() {
+
+        const customer =
+            getSelectedCustomer();
+
+
+        if (!customer) {
+
+            daySales.textContent =
+                "0.00";
+
+            return;
+        }
+
+
+        const month =
+            Number(saleMonth.value);
+
+        const day =
+            Number(saleDay.value);
+
+
+        if (
+            !Number.isInteger(month) ||
+            !Number.isInteger(day) ||
+            day < 1
+        ) {
+
+            daySales.textContent =
+                "0.00";
+
+            return;
+        }
+
+
+        let total = 0;
+
+
+        customer.sales.forEach(
+            function (sale) {
+
+                if (
+                    Number(sale.month) === month &&
+                    Number(sale.day) === day
+                ) {
+
+                    total +=
+                        Number(sale.total) || 0;
+
+                }
+
+            }
+        );
+
+
+        daySales.textContent =
+            money(total);
+
+    }
+
+
+    // ==========================================
+    // ALL DAYS TOTAL
+    // ==========================================
+
+    function calculateAllDaysTotal(customer) {
+
+        let total = 0;
+
+
+        customer.sales.forEach(
+            function (sale) {
+
+                total +=
+                    Number(sale.total) || 0;
+
+            }
+        );
+
+
+        allDaysSales.textContent =
+            money(total);
+
+    }
+
+
+    // ==========================================
+    // SORT SALES
+    // ==========================================
+
+    function sortSales(sales) {
+
+        return sales.slice().sort(
+            function (a, b) {
+
+                const dateA =
+                    a.dateKey || "";
+
+                const dateB =
+                    b.dateKey || "";
+
+                if (dateA !== dateB) {
+
+                    return dateA.localeCompare(dateB);
+
+                }
+
+                return 0;
+
+            }
+        );
+
+    }
+
+
+    // ==========================================
+    // SALES TABLE
+    //
+    // UNLIMITED PRODUCTS
+    //
+    // Three products are shown per table row.
+    // This is NOT a product limit.
     // ==========================================
 
     function renderSalesTable(customer) {
@@ -467,227 +1003,10 @@ document.addEventListener("DOMContentLoaded", function () {
         salesTableContainer.innerHTML = "";
 
 
-        if (customer.sales.length === 0) {
+        if (
+            !customer.sales ||
+            customer.sales.length === 0
+        ) {
 
             salesTableContainer.innerHTML =
-                '<div class="empty">No products added yet.</div>';
-
-            return;
-        }
-
-
-        const table =
-            document.createElement("table");
-
-
-        // ======================================
-        // HEADER
-        // ======================================
-
-        const headerRow =
-            document.createElement("tr");
-
-
-        const detailsHeader =
-            document.createElement("th");
-
-        detailsHeader.textContent =
-            "Details";
-
-        headerRow.appendChild(detailsHeader);
-
-
-        customer.sales.forEach(
-            function (sale, index) {
-
-                const th =
-                    document.createElement("th");
-
-                th.textContent =
-                    "Product " + (index + 1);
-
-                headerRow.appendChild(th);
-
-            }
-        );
-
-
-        table.appendChild(headerRow);
-
-
-        // ======================================
-        // PRODUCT ROW
-        // ======================================
-
-        addTableRow(
-            table,
-            "Product",
-            customer.sales.map(
-                function (sale) {
-                    return sale.product;
-                }
-            )
-        );
-
-
-        // ======================================
-        // COST ROW
-        // ======================================
-
-        addTableRow(
-            table,
-            "Cost",
-            customer.sales.map(
-                function (sale) {
-                    return "₹" + Number(sale.cost).toFixed(2);
-                }
-            )
-        );
-
-
-        // ======================================
-        // QUANTITY ROW
-        // ======================================
-
-        addTableRow(
-            table,
-            "Quantity",
-            customer.sales.map(
-                function (sale) {
-                    return sale.quantity;
-                }
-            )
-        );
-
-
-        // ======================================
-        // TOTAL ROW
-        // ======================================
-
-        addTableRow(
-            table,
-            "Total",
-            customer.sales.map(
-                function (sale) {
-                    return "₹" + Number(sale.total).toFixed(2);
-                }
-            )
-        );
-
-
-        // ======================================
-        // DATE ROW
-        // ======================================
-
-        addTableRow(
-            table,
-            "Date",
-            customer.sales.map(
-                function (sale) {
-                    return sale.date;
-                }
-            )
-        );
-
-
-        const container =
-            document.createElement("div");
-
-        container.className =
-            "table-container";
-
-        container.appendChild(table);
-
-        salesTableContainer.appendChild(container);
-
-    }
-
-
-    // ==========================================
-    // ADD ROW TO TABLE
-    // ==========================================
-
-    function addTableRow(
-        table,
-        title,
-        values
-    ) {
-
-        const row =
-            document.createElement("tr");
-
-
-        const titleCell =
-            document.createElement("th");
-
-        titleCell.textContent =
-            title;
-
-        row.appendChild(titleCell);
-
-
-        values.forEach(
-            function (value) {
-
-                const cell =
-                    document.createElement("td");
-
-                cell.textContent =
-                    value;
-
-                row.appendChild(cell);
-
-            }
-        );
-
-
-        table.appendChild(row);
-
-    }
-
-
-    // ==========================================
-    // BACK BUTTON
-    // ==========================================
-
-    backButton.addEventListener(
-        "click",
-        function () {
-            showCustomerScreen();
-        }
-    );
-
-
-    // ==========================================
-    // PRINT ALL-DAYS SALES
-    // ==========================================
-
-    printSales.addEventListener(
-        "click",
-        function () {
-
-            const customer =
-                getSelectedCustomer();
-
-
-            if (!customer) {
-
-                alert("Customer not found.");
-
-                return;
-            }
-
-
-            window.print();
-
-        }
-    );
-
-
-    // ==========================================
-    // INITIAL LOAD
-    // ==========================================
-
-    showCustomerScreen();
-
-});
+       
