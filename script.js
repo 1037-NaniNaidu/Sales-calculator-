@@ -2,7 +2,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     alert("JavaScript is working!");
 
-    const addProductButton = document.getElementById("addProductButton");
+    const addProductButton = document.getElementById("addProduct");
 
     if (addProductButton) {
         addProductButton.addEventListener("click", function () {
