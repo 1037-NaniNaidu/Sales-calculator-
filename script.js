@@ -1,2 +1,2 @@
-  alert("NEW SCRIPT TEST 123");      
+alert("SCRIPT.JS TEST 123");    
         
