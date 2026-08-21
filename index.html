@@ -3,186 +3,228 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1565c0">
-    <title>TEST WEBSITE</title>
-    <link rel="stylesheet" href="style.css">
+
+    <title>Store Sales Manager</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #eef3f8;
+            color: #17212b;
+        }
+
+        .app {
+            width: min(100% - 24px, 620px);
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 16px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 6px 0 12px;
+            border: 1px solid #bbb;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .card {
+            background: white;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .customer-button {
+            width: 100%;
+            text-align: left;
+            background: white;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .customer-button:hover {
+            background: #f5f5f5;
+        }
+
+        .primary {
+            width: 100%;
+            background: #1565c0;
+            color: white;
+            margin-bottom: 15px;
+        }
+
+        .secondary {
+            background: #607d8b;
+            color: white;
+        }
+
+        .danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row button {
+            flex: 1;
+        }
+
+        .sale-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total {
+            font-size: 20px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .empty {
+            text-align: center;
+            color: #777;
+            padding: 20px;
+        }
+    </style>
 </head>
 
 <body>
 
 <main class="app">
 
-    <header>
-        <h1>Store Sales Manager</h1>
-        <p>Manage customers and daily sales.</p>
-    </header>
-
-    <!-- CUSTOMER LIST SCREEN -->
+    <!-- CUSTOMER SCREEN -->
     <section id="customerScreen">
 
-        <section class="card">
+        <h1>Store Sales Manager</h1>
 
-            <h2>👥 Customers</h2>
+        <button id="addCustomer" class="primary">
+            + Add Customer
+        </button>
 
-            <button type="button" id="addCustomer">
-                ➕ Add Customer
-            </button>
-
-            <div id="customerList">
-                <p>No customers added yet.</p>
-            </div>
-
-        </section>
+        <div id="customerList"></div>
 
     </section>
 
 
-    <!-- CUSTOMER MENU SCREEN -->
+    <!-- CUSTOMER MENU -->
     <section id="customerMenu" class="hidden">
 
-        <section class="card">
-
-            <button type="button" id="backToCustomers" class="secondary">
-                ← Back to Customers
+        <div class="row">
+            <button id="backButton" class="secondary">
+                ← Back
             </button>
+        </div>
 
-            <h2 id="customerTitle">
-                Customer
-            </h2>
+        <br>
 
-        </section>
+        <div class="card">
+            <h2 id="customerName"></h2>
+
+            <p>
+                Today's Sales:
+                ₹<span id="daySales">0</span>
+            </p>
+
+            <p>
+                Total Sales:
+                ₹<span id="totalSales">0</span>
+            </p>
+        </div>
 
 
-        <!-- ADD PRODUCT -->
-        <section class="card">
+        <div class="card">
 
-            <h2>📦 Add Product</h2>
-
-            <label for="productName">
-                Product Name
-            </label>
+            <h3>Add Product</h3>
 
             <input
-                id="productName"
                 type="text"
-                placeholder="Example: Fish"
+                id="productName"
+                placeholder="Product name"
             >
 
-            <label for="productPrice">
-                Cost (₹)
-            </label>
-
             <input
-                id="productPrice"
                 type="number"
+                id="productCost"
+                placeholder="Cost"
                 min="0"
-                step="0.01"
-                placeholder="Enter cost"
             >
 
-            <button type="button" id="addProduct">
-                ➕ Add Product
+            <button id="addProduct" class="primary">
+                Add Product
             </button>
 
-            <div id="productList">
-                <p>No products added yet.</p>
-            </div>
-
-        </section>
+        </div>
 
 
-        <!-- ADD SALE -->
-        <section class="card">
+        <div class="card">
 
-            <h2>🧾 Add Sale</h2>
+            <h3>Sales</h3>
 
-            <p id="currentDay"></p>
+            <div id="salesList"></div>
 
-            <label for="saleProduct">
-                Product
-            </label>
+        </div>
 
-            <select id="saleProduct">
-                <option value="">Select Product</option>
-            </select>
+    </section>
 
-            <p id="selectedPrice">
-                Price: ₹0.00
-            </p>
 
-            <label for="saleQuantity">
-                Quantity
-            </label>
+    <!-- ADD CUSTOMER FORM -->
+    <section id="customerForm" class="hidden">
+
+        <div class="card">
+
+            <h2>Add Customer</h2>
 
             <input
-                id="saleQuantity"
-                type="number"
-                min="1"
-                step="1"
-                placeholder="Enter quantity"
+                type="text"
+                id="newCustomerName"
+                placeholder="Customer name"
             >
 
-            <p id="saleAmount">
-                Sale Amount: ₹0.00
-            </p>
+            <div class="row">
 
-            <button type="button" id="addSale">
-                ➕ Add Sale
-            </button>
+                <button id="saveCustomer" class="primary">
+                    Save
+                </button>
 
-        </section>
+                <button id="cancelCustomer" class="secondary">
+                    Cancel
+                </button>
 
-
-        <!-- DAY SALES -->
-        <section class="card">
-
-            <h2>📅 Day Sales</h2>
-
-            <div id="daySales">
-                <p>₹0.00</p>
             </div>
 
-        </section>
-
-
-        <!-- TOTAL SALES -->
-        <section class="card result">
-
-            <h2>💰 Total Sales</h2>
-
-            <div id="totalSales">
-                <p class="total">₹0.00</p>
-            </div>
-
-        </section>
-
-
-        <!-- SALES HISTORY -->
-        <section class="card">
-
-            <h2>📊 Sales History</h2>
-
-            <div id="salesHistory">
-                <p>No sales recorded yet.</p>
-            </div>
-
-        </section>
-
-
-        <!-- PRINT -->
-        <section class="card">
-
-            <button type="button" id="printSales">
-                🖨️ Print Sales Details
-            </button>
-
-        </section>
+        </div>
 
     </section>
 
 </main>
 
-<script src="script.js?v=2"></script>
+<script src="script.js"></script>
 
 </body>
 </html>
