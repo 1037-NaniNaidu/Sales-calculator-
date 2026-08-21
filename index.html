@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1565c0">
-
     <title>Store Sales Manager</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -16,218 +14,171 @@
 
     <header>
         <h1>Store Sales Manager</h1>
-        <p>Manage products, customers and daily sales.</p>
+        <p>Manage customers and daily sales.</p>
     </header>
 
+    <!-- CUSTOMER LIST SCREEN -->
+    <section id="customerScreen">
 
-    <!-- =========================================
-         PRODUCTS
-    ========================================== -->
+        <section class="card">
+            <h2>👥 Customers</h2>
 
-    <section class="card">
+            <button type="button" id="addCustomer">
+                ➕ Add Customer
+            </button>
 
-        <h2>📦 Products</h2>
-
-        <label for="productName">
-            Product Name
-        </label>
-
-        <input
-            id="productName"
-            type="text"
-            placeholder="Example: Shampoo"
-        >
-
-        <label for="productPrice">
-            Price per item (₹)
-        </label>
-
-        <input
-            id="productPrice"
-            type="number"
-            min="0"
-            step="0.01"
-            placeholder="Example: 50"
-        >
-
-        <button
-            type="button"
-            id="addProduct">
-            Add Product
-        </button>
-
-        <div id="productList">
-            <p>No products added yet.</p>
-        </div>
+            <div id="customerList">
+                <p>No customers added yet.</p>
+            </div>
+        </section>
 
     </section>
 
 
-    <!-- =========================================
-         REGULAR CUSTOMERS
-    ========================================== -->
+    <!-- CUSTOMER MENU SCREEN -->
+    <section id="customerMenu" class="hidden">
 
-    <section class="card">
+        <section class="card">
 
-        <h2>👤 Regular Customers</h2>
+            <button type="button" id="backToCustomers" class="secondary">
+                ← Back to Customers
+            </button>
 
-        <label for="customerName">
-            Customer Name
-        </label>
+            <h2 id="customerTitle">Customer</h2>
 
-        <input
-            id="customerName"
-            type="text"
-            placeholder="Example: Abhi"
-        >
-
-        <button
-            type="button"
-            id="addCustomer">
-            Add Customer
-        </button>
-
-        <div id="customerList">
-            <p>No customers added yet.</p>
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- =========================================
-         SALES ENTRY
-    ========================================== -->
+        <!-- ADD PRODUCT -->
+        <section class="card">
 
-    <section class="card">
+            <h2>📦 Add Product</h2>
 
-        <h2>🧾 Enter Sale</h2>
+            <label for="productName">
+                Product Name
+            </label>
 
-        <h3 id="currentDay">
-            Sales Day 1
-        </h3>
+            <input
+                id="productName"
+                type="text"
+                placeholder="Example: Fish"
+            >
 
-        <label for="saleCustomer">
-            Customer
-        </label>
+            <label for="productPrice">
+                Cost (₹)
+            </label>
 
-        <select id="saleCustomer">
+            <input
+                id="productPrice"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="Enter cost"
+            >
 
-            <option value="">
-                Walk-in / No Regular Customer
-            </option>
+            <button type="button" id="addProduct">
+                ➕ Add Product
+            </button>
 
-        </select>
+            <div id="productList">
+                <p>No products added yet.</p>
+            </div>
 
-
-        <label for="saleProduct">
-            Product
-        </label>
-
-        <select id="saleProduct">
-
-            <option value="">
-                Select Product
-            </option>
-
-        </select>
-
-
-        <p id="selectedPrice">
-            Price: ₹0.00
-        </p>
+        </section>
 
 
-        <label for="saleQuantity">
-            Quantity Sold
-        </label>
+        <!-- ADD SALE -->
+        <section class="card">
 
-        <input
-            id="saleQuantity"
-            type="number"
-            min="1"
-            step="1"
-            placeholder="Enter quantity"
-        >
+            <h2>🧾 Add Sale</h2>
 
+            <p id="currentDay"></p>
 
-        <p id="saleAmount">
-            Sale Amount: ₹0.00
-        </p>
+            <label for="saleProduct">
+                Product
+            </label>
 
+            <select id="saleProduct">
+                <option value="">Select Product</option>
+            </select>
 
-        <button
-            type="button"
-            id="addSale">
-            Add Sale
-        </button>
+            <p id="selectedPrice">
+                Price: ₹0.00
+            </p>
 
-    </section>
+            <label for="saleQuantity">
+                Quantity
+            </label>
 
+            <input
+                id="saleQuantity"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Enter quantity"
+            >
 
-    <!-- =========================================
-         DAILY SALES TRACKER
-    ========================================== -->
+            <p id="saleAmount">
+                Sale Amount: ₹0.00
+            </p>
 
-    <section class="card">
+            <button type="button" id="addSale">
+                ➕ Add Sale
+            </button>
 
-        <h2>📅 Daily Sales Tracker</h2>
-
-        <div id="dailySales">
-            <p>No sales recorded yet.</p>
-        </div>
-
-    </section>
-
-
-    <!-- =========================================
-         CUSTOMER SALES
-    ========================================== -->
-
-    <section class="card">
-
-        <h2>👥 Customer Sales</h2>
-
-        <div id="customerSales">
-            <p>No customer sales recorded yet.</p>
-        </div>
-
-    </section>
+        </section>
 
 
-    <!-- =========================================
-         STORE GRAND TOTAL
-    ========================================== -->
+        <!-- DAY SALES -->
+        <section class="card">
 
-    <section
-        class="card result"
-        id="overallTotal">
+            <h2>📅 Day Sales</h2>
 
-        <h2>💰 Store Grand Total</h2>
+            <div id="daySales">
+                <p>₹0.00</p>
+            </div>
 
-        <p>
-            0 items = ₹0.00
-        </p>
+        </section>
+
+
+        <!-- TOTAL SALES -->
+        <section class="card result">
+
+            <h2>💰 Total Sales</h2>
+
+            <div id="totalSales">
+                <p class="total">₹0.00</p>
+            </div>
+
+        </section>
+
+
+        <!-- SALES HISTORY -->
+        <section class="card">
+
+            <h2>📊 Sales History</h2>
+
+            <div id="salesHistory">
+                <p>No sales recorded yet.</p>
+            </div>
+
+        </section>
+
+
+        <!-- PRINT -->
+        <section class="card">
+
+            <button type="button" id="printSales">
+                🖨️ Print Sales Details
+            </button>
+
+        </section>
 
     </section>
-
-
-    <!-- =========================================
-         CLEAR
-    ========================================== -->
-
-    <button
-        type="button"
-        id="clearAll"
-        class="secondary">
-
-        Clear All Sales
-
-    </button>
 
 </main>
-
 
 <script src="script.js"></script>
 
 </body>
-</html>
+            </html>
